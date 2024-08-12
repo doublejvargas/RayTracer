@@ -143,11 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Capp.cpp" />
+    <ClCompile Include="rtRayTrace\rtImage.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Capp.h" />
+    <ClInclude Include="Capp.hpp" />
+    <ClInclude Include="rtRayTrace\rtImage.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
