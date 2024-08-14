@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\dev\RayTracer\Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RayTracer;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,7 +131,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\dev\RayTracer\Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RayTracer;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,13 +145,18 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Capp.cpp" />
+    <ClCompile Include="rtRayTrace\Camera.cpp" />
+    <ClCompile Include="rtRayTrace\Ray.cpp" />
     <ClCompile Include="rtRayTrace\rtImage.cpp" />
     <ClCompile Include="rtRayTrace\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp" />
+    <ClInclude Include="rtRayTrace\Camera.hpp" />
+    <ClInclude Include="rtRayTrace\Ray.hpp" />
     <ClInclude Include="rtRayTrace\rtImage.hpp" />
     <ClInclude Include="rtRayTrace\Scene.hpp" />
+    <ClInclude Include="toolbox\qbVector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
