@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include "rtRayTrace/rtImage.hpp"
+#include "rtRayTrace/Scene.hpp"
 
 class Capp
 {
@@ -18,6 +19,9 @@ public:
 private:
 	// Image instance
 	rtImage m_Image;
+
+	// Scene instance
+	rt::Scene m_Scene;
 
 	// SDL2 stuff
 	bool m_isRunning;

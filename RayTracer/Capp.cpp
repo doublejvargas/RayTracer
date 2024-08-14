@@ -20,19 +20,7 @@ bool Capp::OnInit()
 
 		// Initialize the rtImage instance
 		m_Image.Initialize(1280, 720, m_pRenderer);
-
-		// Create some color variations
-		for (int x = 0; x < 1280; x++)
-		{
-			for (int y = 0; y < 720; y++)
-			{
-				double red = (static_cast<double>(x) / 1280.0) * 255.0;
-				double green = (static_cast<double>(y) / 720.0) * 255.0;
-				m_Image.SetPixel(x, y, red, green, 0.0);
-			}
-		}
 	}
-		
 	else
 		return false;
 
@@ -77,6 +65,9 @@ void Capp::OnRender()
 	// Set background color to white
 	SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(m_pRenderer);
+
+	// Render the scene
+	m_Scene.Render(m_Image);
 
 	// Display the image
 	m_Image.Display();

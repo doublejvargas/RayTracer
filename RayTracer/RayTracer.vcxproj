@@ -146,10 +146,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Capp.cpp" />
     <ClCompile Include="rtRayTrace\rtImage.cpp" />
+    <ClCompile Include="rtRayTrace\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp" />
     <ClInclude Include="rtRayTrace\rtImage.hpp" />
+    <ClInclude Include="rtRayTrace\Scene.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

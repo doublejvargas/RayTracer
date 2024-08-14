@@ -24,12 +24,18 @@
     <ClCompile Include="rtRayTrace\rtImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtRayTrace\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rtRayTrace\rtImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

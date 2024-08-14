@@ -2,7 +2,7 @@
 
 // why not call init here w params?
 rtImage::rtImage() :
-	m_xSize{0}, m_ySize{0}, m_pRenderer{nullptr}, m_pTexture{nullptr} { }
+	m_Width{0}, m_Height{0}, m_pRenderer{nullptr}, m_pTexture{nullptr} { }
 
 rtImage::~rtImage()
 {
@@ -12,16 +12,16 @@ rtImage::~rtImage()
 }
 
 // why not pass these parameters to the constructor and then call initialize from the constructor?
-void rtImage::Initialize(const int xSize, const int ySize, SDL_Renderer *pRenderer)
+void rtImage::Initialize(const int width, const int height, SDL_Renderer *pRenderer)
 {
 	// Resize image arrays
-	m_rChannel.resize(xSize, std::vector<double>(ySize, 0.0));
-	m_gChannel.resize(xSize, std::vector<double>(ySize, 0.0));
-	m_bChannel.resize(xSize, std::vector<double>(ySize, 0.0));
+	m_rChannel.resize(width, std::vector<double>(height, 0.0));
+	m_gChannel.resize(width, std::vector<double>(height, 0.0));
+	m_bChannel.resize(width, std::vector<double>(height, 0.0));
 
 	// Store the dimensions
-	m_xSize = xSize;
-	m_ySize = ySize;
+	m_Width = width;
+	m_Height = height;
 
 	// Store the pointer to the renderer
 	m_pRenderer = pRenderer;
@@ -40,23 +40,24 @@ void rtImage::SetPixel(const int x, const int y, const double r, const double g,
 void rtImage::Display()
 {
 	// ALlocate memory for a pixel buffer (why not use malloc/calloc?)
-	//uint32_t *tempPixels = new uint32_t[(size_t)m_xSize * m_ySize];
+	//uint32_t *tempPixels = new uint32_t[(size_t)Width * Height];
 
 	// Clear the pixel buffer
-	//memset(tempPixels, 0, (size_t)m_xSize * m_ySize * sizeof(uint32_t));
+	//memset(tempPixels, 0, (size_t)Width * Height * sizeof(uint32_t));
 
-	// Allocate memory for a pixel buffer
-	uint32_t *tempPixels = (uint32_t *)calloc((size_t)m_xSize * m_ySize, sizeof(uint32_t));  // DON'T forget to free!
+	// Allocate memory for a pixel buffer (my version)
+	uint32_t *tempPixels = (uint32_t *)calloc((size_t)m_Width * m_Height, sizeof(uint32_t));  // DON'T forget to free!
 
 	// Set pixel colors inside pixel buffer
-	for (int x = 0; x < m_xSize; x++) {
-		for (int y = 0; y < m_ySize; y++) {
-			tempPixels[(y * m_xSize) + x] = ConvertColor(m_rChannel.at(x).at(y), m_gChannel.at(x).at(y), m_bChannel.at(x).at(y));
+	for (int x = 0; x < m_Width; x++) {
+		for (int y = 0; y < m_Height; y++) {
+			if(tempPixels)
+				tempPixels[(y * m_Width) + x] = ConvertColor(m_rChannel.at(x).at(y), m_gChannel.at(x).at(y), m_bChannel.at(x).at(y));
 		}
 	}
 
 	 // Update the texture with the pixel buffer
-	SDL_UpdateTexture(m_pTexture, nullptr, tempPixels, m_xSize * sizeof(uint32_t));
+	SDL_UpdateTexture(m_pTexture, nullptr, tempPixels, m_Width * sizeof(uint32_t));
 
 	// Free the pixel buffer
 	//delete[] tempPixels;
@@ -66,8 +67,8 @@ void rtImage::Display()
 	SDL_Rect srcRect, bounds;
 	srcRect.x = 0;
 	srcRect.y = 0;
-	srcRect.w = m_xSize;
-	srcRect.h = m_ySize;
+	srcRect.w = m_Width;
+	srcRect.h = m_Height;
 	bounds = srcRect;
 	SDL_RenderCopy(m_pRenderer, m_pTexture, &srcRect, &bounds);
 }
@@ -108,7 +109,7 @@ void rtImage::InitTexture()
 		SDL_DestroyTexture(m_pTexture);
 
 	// Create the texture that will store the image
-	SDL_Surface *tempSurface = SDL_CreateRGBSurface(0, m_xSize, m_ySize, 32, rmask, gmask, bmask, amask);
+	SDL_Surface *tempSurface = SDL_CreateRGBSurface(0, m_Width, m_Height, 32, rmask, gmask, bmask, amask);
 	m_pTexture = SDL_CreateTextureFromSurface(m_pRenderer, tempSurface);
 	SDL_FreeSurface(tempSurface);
 }
