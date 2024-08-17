@@ -1,5 +1,7 @@
 
 #include "Ray.hpp"
 
-rt::Ray::Ray(const qbVector<double> &p1, const qbVector<double> &p2) :
-	m_p1{p1}, m_p2{p2}, m_lab{m_p2 - m_p1} {}
+// There is no copy constructor to initialize a qbVector from another qbVector in qbVector.h...
+// ... so how is this initializer list working?
+rt::Ray::Ray(const qbVector<double> &point1, const qbVector<double> &point2) :
+	p1{point1}, p2{point2}, lab{p2 - p1} {}

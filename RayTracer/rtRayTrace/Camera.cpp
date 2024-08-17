@@ -5,8 +5,8 @@ rt::Camera::Camera()
 	m_cameraPosition = qbVector<double>{ std::vector<double>{0.0, -10.0, 0.0} };
 	m_cameraLookAt = qbVector<double>{ std::vector<double>{0.0, 0.0, 0.0} };
 	m_cameraUp = qbVector<double>{ std::vector<double>{0.0, 0.0, 1.0} };
-	m_cameraLength = 1.0;
-	m_cameraHorSize = 1.0;
+	m_toScreenLenght = 1.0;
+	m_screenWidth = 1.0;
 	m_cameraAspectRatio = 1.0;
 }
 
@@ -27,12 +27,12 @@ void rt::Camera::SetUp(const qbVector<double> &upVector)
 
 void rt::Camera::SetLength(double newLength)
 {
-	m_cameraLength = newLength;
+	m_toScreenLenght = newLength;
 }
 
-void rt::Camera::SetHorSize(double newSize)
+void rt::Camera::SetProjScreenWidth(double newSize)
 {
-	m_cameraHorSize = newSize;
+	m_screenWidth = newSize;
 }
 
 void rt::Camera::SetAspect(double newAspect)
@@ -43,28 +43,41 @@ void rt::Camera::SetAspect(double newAspect)
 void rt::Camera::UpdateCameraGeometry()
 {
 	// First, compute the vector from the camera position to the lookAt position
+	// The alignment vector passes directly from the camera pinhole, through the virtual projected screen
+	// onto the object the rays are being casted onto. Therefore, the intersection with the projected
+	// virtual screen denotes the center of the screen.
 	m_alignmentVector = m_cameraLookAt - m_cameraPosition;
 	m_alignmentVector.Normalize();
 
 	// Second, compute the U and V vectors
+
+	/* The U basis vector in the projected screen is perpendicular to the plane defined by the Camera space's up vector
+	*	and the vector from camera to "lookAt" position (alignmentVector). Therefore, to compute basis U vector in camera space,
+	*   we compute the cross product of the alignment vector and the camera space's up vector.
+	*/
 	m_projectionScreenU = qbVector<double>::cross(m_alignmentVector, m_cameraUp);
 	m_projectionScreenU.Normalize();
+
+	/* The V basis vector in the projected screen is perpendicular to the plane defined by U vector in camera space
+	*	and the vector from camera to "lookAt" position (alignmentVector). Therefore, to compute basis V vector in camera space, 
+	*   we compute the cross product of the U basis vector and the alignment vector.s
+	*/
 	m_projectionScreenV = qbVector<double>::cross(m_projectionScreenU, m_alignmentVector);
 	m_projectionScreenV.Normalize();
 
-	// Thirdly, compute the position of the center point of the screen
-	m_projectionScreenCenter = m_cameraPosition + (m_cameraLength * m_alignmentVector);
+	// Thirdly, compute the position of the center point of the virtual projected screen
+	m_projectionScreenCenter = m_cameraPosition + (m_toScreenLenght * m_alignmentVector);
 
 	// Modify the U and V vectors to match the size and aspect ratio
-	m_projectionScreenU = m_projectionScreenU * m_cameraHorSize;
-	m_projectionScreenV = m_projectionScreenV * (m_cameraHorSize / m_cameraAspectRatio);
+	m_projectionScreenU = m_projectionScreenU * m_screenWidth;
+	m_projectionScreenV = m_projectionScreenV * (m_screenWidth / m_cameraAspectRatio);
 }
 
 rt::Ray rt::Camera::GenerateRay(float proScreenX, float proScreenY)
 {
-	// Compute the location of the screen point in world coordinates
-	qbVector<double> screenWorldPart1 = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
-	qbVector<double> screenWorldCoordinate = screenWorldPart1 + (m_projectionScreenV * proScreenY);
+	// Compute the location of the virtual projected screen point in world coordinates (ie, camera world coordinates)
+	qbVector<double> screenWorldX = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
+	qbVector<double> screenWorldCoordinate = screenWorldX + (m_projectionScreenV * proScreenY);
 
 	// Use this point along with camera position to compute the ray
 	return rt::Ray(m_cameraPosition, screenWorldCoordinate);

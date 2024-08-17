@@ -20,6 +20,27 @@ bool Capp::OnInit()
 
 		// Initialize the rtImage instance
 		m_Image.Initialize(1280, 720, m_pRenderer);
+
+		// Test the camera class
+		rt::Camera testCamera;
+		testCamera.SetPosition(qbVector<double>(std::vector<double>{0.0, 0.0, 0.0}));
+		testCamera.SetLookAt(qbVector<double>(std::vector<double>{0.0, 2.0, 0.0}));  // Camera space Y axis is into/out of screen
+		testCamera.SetUp(qbVector<double>(std::vector<double>{0.0, 0.0, 1.0}));
+		testCamera.SetLength(1.0);
+		testCamera.SetProjScreenWidth(1.0);
+		testCamera.SetAspect(1.0);
+		testCamera.UpdateCameraGeometry();
+
+		// Get screen center and and U, V vectors and display
+		auto screenCenter = testCamera.GetScreenCenter();
+		auto screenU = testCamera.GetU();
+		auto screenV = testCamera.GetV(); 
+		std::cout << "Projected screen center:" << std::endl;
+		PrintVector(screenCenter);
+		std::cout << "\nProjected screen U vector:" << std::endl;
+		PrintVector(screenU);
+		std::cout << "\nProjected screen V vector:" << std::endl;
+		PrintVector(screenV);
 	}
 	else
 		return false;
@@ -83,5 +104,15 @@ void Capp::OnExit()
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = nullptr;
 	SDL_Quit();
+}
+
+// PRIVATE FUNCTIONS		
+void Capp::PrintVector(const qbVector<double> &inputVector) const
+{
+	int rows = inputVector.GetNumDims();
+	for (int r = 0; r < rows; r++) 
+	{
+		std::cout << std::fixed << std::setprecision(3) << inputVector.GetElement(r) << std::endl;
+	}
 }
 
