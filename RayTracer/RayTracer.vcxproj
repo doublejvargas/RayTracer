@@ -146,6 +146,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Capp.cpp" />
     <ClCompile Include="rtRayTrace\Camera.cpp" />
+    <ClCompile Include="rtRayTrace\ObjectBase.cpp" />
+    <ClCompile Include="rtRayTrace\objsphere.cpp" />
     <ClCompile Include="rtRayTrace\Ray.cpp" />
     <ClCompile Include="rtRayTrace\rtImage.cpp" />
     <ClCompile Include="rtRayTrace\Scene.cpp" />
@@ -153,6 +155,8 @@
   <ItemGroup>
     <ClInclude Include="Capp.hpp" />
     <ClInclude Include="rtRayTrace\Camera.hpp" />
+    <ClInclude Include="rtRayTrace\ObjectBase.hpp" />
+    <ClInclude Include="rtRayTrace\objsphere.hpp" />
     <ClInclude Include="rtRayTrace\Ray.hpp" />
     <ClInclude Include="rtRayTrace\rtImage.hpp" />
     <ClInclude Include="rtRayTrace\Scene.hpp" />

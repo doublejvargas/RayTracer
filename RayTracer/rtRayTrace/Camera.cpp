@@ -20,7 +20,7 @@ void rt::Camera::SetLookAt(const qbVector<double> &newLookAt)
 	m_cameraLookAt = newLookAt;
 }
 
-void rt::Camera::SetUp(const qbVector<double> &upVector)
+void rt::Camera::SetUpVector(const qbVector<double> &upVector)
 {
 	m_cameraUp = upVector;
 }
@@ -73,12 +73,16 @@ void rt::Camera::UpdateCameraGeometry()
 	m_projectionScreenV = m_projectionScreenV * (m_screenWidth / m_cameraAspectRatio);
 }
 
-rt::Ray rt::Camera::GenerateRay(float proScreenX, float proScreenY)
-{
+bool rt::Camera::GenerateRay(float proScreenX, float proScreenY, rt::Ray &cameraRay)
+{ 
 	// Compute the location of the virtual projected screen point in world coordinates (ie, camera world coordinates)
 	qbVector<double> screenWorldX = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
 	qbVector<double> screenWorldCoordinate = screenWorldX + (m_projectionScreenV * proScreenY);
 
-	// Use this point along with camera position to compute the ray
-	return rt::Ray(m_cameraPosition, screenWorldCoordinate);
+	// Use this point along with camera position to compute the ray and store to parameter cameraRay
+	cameraRay.p1 = m_cameraPosition;
+	cameraRay.p2 = screenWorldCoordinate;
+	cameraRay.lab = screenWorldCoordinate - m_cameraPosition;
+	
+	return true;
 }

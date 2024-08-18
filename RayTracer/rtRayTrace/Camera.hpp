@@ -14,7 +14,7 @@ namespace rt
 		// Setters (set camera parameters)
 		void SetPosition(const qbVector<double> &newPos);		// argument must be a 3d vector
 		void SetLookAt(const qbVector<double> &newLookAt);		// argument must be a 3d vector
-		void SetUp(const qbVector<double> &upVector);			// argument must be a 3d vector
+		void SetUpVector(const qbVector<double> &upVector);			// argument must be a 3d vector
 		void SetLength(double newLength);
 		void SetProjScreenWidth(double newSize);
 		void SetAspect(double newAspect);
@@ -22,7 +22,7 @@ namespace rt
 		// Getters (return camera parameters)
 		inline qbVector<double> const GetPosition()		{ return m_cameraPosition; }
 		inline qbVector<double> const GetLookAt()		{ return m_cameraLookAt; }
-		inline qbVector<double> const GetUp()			{ return m_cameraUp; }
+		inline qbVector<double> const GetUpVector()		{ return m_cameraUp; }
 		inline qbVector<double> const GetU()			{ return m_projectionScreenU; }
 		inline qbVector<double> const GetV()			{ return m_projectionScreenV; }
 		inline qbVector<double> const GetScreenCenter()	{ return m_projectionScreenCenter; }
@@ -33,8 +33,8 @@ namespace rt
 		// Update the camera geometry
 		void UpdateCameraGeometry();
 
-		// Generates a ray from camera pinhole to projected, virtual camera at point proScreenX and proScreenY.
-		Ray GenerateRay(float proScreenX, float proScreenY);
+		// Generates a ray from camera pinhole to projected, virtual screen at point proScreenX and proScreenY and stores to cameraRay parameter.
+		bool GenerateRay(float proScreenX, float proScreenY, rt::Ray &cameraRay);
 
 	private:
 		// Just like in Ray.hpp, we make the assumption of 3-Dimensional space here by having vectors of 3 components.

@@ -21,26 +21,18 @@ bool Capp::OnInit()
 		// Initialize the rtImage instance
 		m_Image.Initialize(1280, 720, m_pRenderer);
 
-		// Test the camera class
-		rt::Camera testCamera;
-		testCamera.SetPosition(qbVector<double>(std::vector<double>{0.0, 0.0, 0.0}));
-		testCamera.SetLookAt(qbVector<double>(std::vector<double>{0.0, 2.0, 0.0}));  // Camera space Y axis is into/out of screen
-		testCamera.SetUp(qbVector<double>(std::vector<double>{0.0, 0.0, 1.0}));
-		testCamera.SetLength(1.0);
-		testCamera.SetProjScreenWidth(1.0);
-		testCamera.SetAspect(1.0);
-		testCamera.UpdateCameraGeometry();
+		// Set background to white
+		SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(m_pRenderer);
 
-		// Get screen center and and U, V vectors and display
-		auto screenCenter = testCamera.GetScreenCenter();
-		auto screenU = testCamera.GetU();
-		auto screenV = testCamera.GetV(); 
-		std::cout << "Projected screen center:" << std::endl;
-		PrintVector(screenCenter);
-		std::cout << "\nProjected screen U vector:" << std::endl;
-		PrintVector(screenU);
-		std::cout << "\nProjected screen V vector:" << std::endl;
-		PrintVector(screenV);
+		// Render the scene
+		m_Scene.Render(m_Image);
+
+		// Display the image
+		m_Image.Display();
+
+		// Present
+		SDL_RenderPresent(m_pRenderer);
 	}
 	else
 		return false;
@@ -83,7 +75,7 @@ void Capp::OnLoop()
 
 void Capp::OnRender()
 {	
-	// Set background color to white
+	/*// Set background color to white
 	SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(m_pRenderer);
 
@@ -94,7 +86,7 @@ void Capp::OnRender()
 	m_Image.Display();
 
 	// Display the result
-	SDL_RenderPresent(m_pRenderer);
+	SDL_RenderPresent(m_pRenderer);*/
 }
 
 void Capp::OnExit()

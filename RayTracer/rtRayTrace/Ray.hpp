@@ -7,7 +7,8 @@ namespace rt
 	class Ray
 	{
 	public:
-		// Constructor (we don't need a default constructor for this class) (?)
+		// Default constructor
+		Ray();
 		// Prereq. of point1 and point2 is that they are 3D vectors
 		Ray(const qbVector<double> &point1, const qbVector<double> &point2);
 

@@ -1,8 +1,12 @@
 #pragma once
 
+#include "rtImage.hpp"
+#include "Camera.hpp"
+#include "objsphere.hpp"
+
+// lib
 #include <vector>
 #include <SDL2/SDL.h>
-#include "rtImage.hpp"
 
 namespace rt
 {
@@ -14,11 +18,14 @@ namespace rt
 
 		// Function to perform rendering
 		bool Render(rtImage &outputImage);
-
+	
+	// Private methods
 	private:
-		// Private methods
 
+
+	// Private members
 	private:
-		// Private members
+		rt::Camera m_Camera;
+		rt::ObjSphere m_Sphere;
 	};
 }
