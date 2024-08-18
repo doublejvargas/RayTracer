@@ -13,7 +13,7 @@ namespace rt
 		virtual ~ObjectBase();
 
 		// Function to test for intersections
-		virtual bool TestIntersection(const Ray &castRay, const qbVector<double> &intPoint, const qbVector<double> &localNormal, const qbVector<double> &localColor);
+		virtual bool TestIntersection(const Ray &castRay, qbVector<double> &intPoint, qbVector<double> &localNormal, qbVector<double> &localColor);
 
 		// Function to test whether two floating-point numbers are close to being equal (should this be static?)
 		bool CloseEnough(const double f1, const double f2);

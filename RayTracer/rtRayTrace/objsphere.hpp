@@ -15,7 +15,7 @@ namespace rt
 		virtual ~ObjSphere() override;
 
 		// Override function that tests intersections
-		virtual bool TestIntersection(const Ray &castRay, const qbVector<double> &intPoint, const qbVector<double> &localNormal, const qbVector<double> &localColor) override;
+		virtual bool TestIntersection(const Ray &castRay, qbVector<double> &intPoint, qbVector<double> &localNormal, qbVector<double> &localColor) override;
 
 	private:
 

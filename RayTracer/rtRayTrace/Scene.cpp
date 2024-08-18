@@ -40,10 +40,18 @@ bool rt::Scene::Render(rtImage &outputImage)
 
 			// Test if we have a valid intersection
 			bool validIntersection = m_Sphere.TestIntersection(cameraRay, intPoint, localNormal, localColor);
-
+			// If we have a valid intersection, change pixel color to red
 			if (validIntersection)
 			{
-				outputImage.SetPixel(x, y, 255.0, .0, .0);
+				// Compute the distance between the camera and the point of intersection
+				double dist = (intPoint - cameraRay.p1).norm();
+				if (dist > maxDist)
+					maxDist = dist;
+				
+				if (dist < minDist)
+					minDist = dist;
+				
+				outputImage.SetPixel(x, y, 255.0 - ((dist - 9.0) / 0.94605) * 255.0, .0, .0);
 			}
 			else
 			{
@@ -51,6 +59,9 @@ bool rt::Scene::Render(rtImage &outputImage)
 			}
 		}
 	}
+
+	std::cout << "Minimum distance: " << minDist << std::endl;
+	std::cout << "Maximum distance: " << maxDist << std::endl;
 
 	return true;
 }

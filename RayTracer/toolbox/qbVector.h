@@ -63,6 +63,10 @@ public:
 	// Functions to return parameters of the vector.
 	int GetNumDims() const;
 
+	// Added by Jose for ep.3
+	// Get vector data as a const reference (to avoid copying)
+	const std::vector<T>& GetData() const;
+
 	// Functions to handle elements of the vector.
 	T GetElement(int index) const;
 	void SetElement(int index, T value);
@@ -78,9 +82,12 @@ public:
 	void Normalize();
 
 	// Overloaded operators.
-	qbVector<T> operator+ (const qbVector<T> &rhs) const;
-	qbVector<T> operator- (const qbVector<T> &rhs) const;
-	qbVector<T> operator* (const T &rhs) const;
+	qbVector<T> operator+	(const qbVector<T> &rhs) const;
+	qbVector<T> operator-	(const qbVector<T> &rhs) const;
+	qbVector<T> operator*	(const T &rhs) const;
+	// Added by Jose for ep.3
+	// Overloaded assignment operator
+	qbVector<T>& operator=	(const qbVector<T> &rhs);
 
 	// Friend functions.
 	template <class U> friend qbVector<U> operator* (const U &lhs, const qbVector<U> &rhs);
@@ -133,6 +140,12 @@ template <class T>
 int qbVector<T>::GetNumDims() const
 {
 	return m_nDims;
+}
+
+template <class T>
+const std::vector<T>& qbVector<T>::GetData() const 
+{
+	return m_vectorData;
 }
 
 /* **************************************************************************************************
@@ -260,6 +273,18 @@ qbVector<T> qbVector<T>::operator* (const T &rhs) const
 		resultData.SetElement(i, (m_vectorData.at(i) * rhs));
 
 	return resultData;
+}
+
+template <class T>
+qbVector<T>& qbVector<T>::operator= (const qbVector<T> &rhs)
+{
+	if (this != &rhs)
+	{
+		m_nDims = rhs.GetNumDims();
+		m_vectorData = rhs.GetData();
+	}
+	
+	return *this;
 }
 
 /* **************************************************************************************************

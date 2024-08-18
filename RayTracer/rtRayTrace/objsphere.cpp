@@ -44,7 +44,7 @@ rt::ObjSphere::~ObjSphere()
 * 
 *	Note: since a = (v̂·v̂), which is the dot product of two unit vectors, it is always equal to 1.0.
 */
-bool rt::ObjSphere::TestIntersection(const Ray &castRay, const qbVector<double> &intPoint, const qbVector<double> &localNormal, const qbVector<double> &localColor)
+bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPoint, qbVector<double> &localNormal, qbVector<double> &localColor)
 {
 	// Compute the values of a, b and c
 	qbVector<double> vHat = castRay.lab;
@@ -60,7 +60,37 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, const qbVector<double> 
 	double c = qbVector<double>::dot(castRay.p1, castRay.p1) - 1.0;
 
 	// Test whether we actually have an intersection
-	double discriminant = (b * b) - 4.0 * c;
+	double discriminant_squared = (b * b) - 4.0 * c;
 
-	return discriminant > 0.0 ? true : false;
+	if (discriminant_squared > 0.0)
+	{
+		double discriminant = sqrt(discriminant_squared);
+		double t1 = (-b + discriminant) / 2.0;
+		double t2 = (-b - discriminant) / 2.0;
+
+		/* If either t1 or t2 are negative, then at least part of the object is behind
+		   the camera and so we will ignore it*/
+		if ((t1 < 0.0) || (t2 < 0.0))
+		{
+			return false;
+		}
+		else
+		{
+			// Determine which point of intersection was closest to the camera
+			if (t1 < t2)
+			{
+				intPoint = castRay.p1 + (vHat * t1);
+			}
+			else
+			{
+				intPoint = castRay.p1 + (vHat * t2);
+			}
+
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
 }
