@@ -3,6 +3,7 @@
 #include "rtImage.hpp"
 #include "Camera.hpp"
 #include "objsphere.hpp"
+#include "pointlight.hpp"
 
 // lib
 #include <vector>
@@ -22,10 +23,12 @@ namespace rt
 	// Private methods
 	private:
 
-
 	// Private members
 	private:
 		rt::Camera m_Camera;
-		rt::ObjSphere m_Sphere;
+		// A list of objects in the scene
+		std::vector<std::shared_ptr<rt::ObjectBase>> m_objectList;
+		// A list of of lights in the scene
+		std::vector<std::shared_ptr<rt::LightBase>> m_lightList;
 	};
 }

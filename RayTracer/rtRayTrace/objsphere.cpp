@@ -86,8 +86,13 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 				intPoint = castRay.p1 + (vHat * t2);
 			}
 
-			return true;
+			// Compute the local normal
+			// Because we have a sphere located at the origin, the normal vector is
+			//  simply a vector from the origin to the point of intersection, i.e., the intersection point.
+			localNormal = intPoint;
+			localNormal.Normalize();
 		}
+		return true;
 	}
 	else
 	{

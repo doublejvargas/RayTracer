@@ -39,6 +39,12 @@
     <ClCompile Include="rtRayTrace\objsphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtRayTrace\LightBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rtRayTrace\pointlight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp">
@@ -63,6 +69,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rtRayTrace\objsphere.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\LightBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\pointlight.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

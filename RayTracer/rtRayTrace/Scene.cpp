@@ -9,6 +9,11 @@ rt::Scene::Scene()
 	m_Camera.SetProjScreenWidth(0.25);
 	m_Camera.SetAspect(16.0 / 9.0);
 	m_Camera.UpdateCameraGeometry();
+
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere())); // make a sphere
+	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight())); // make a point light
+	m_lightList.at(0)->m_Location = qbVector<double>{ std::vector<double>{5.0, -10.0, -5.0} }; // -z value because currently the z axis is inverted in our application.
+	m_lightList.at(0)->m_Color = qbVector<double>{ std::vector<double>{255.0, 255.0, 255.0} };
 }
 
 bool rt::Scene::Render(rtImage &outputImage)
@@ -38,24 +43,44 @@ bool rt::Scene::Render(rtImage &outputImage)
 			// Generate the ray for this pixel
 			m_Camera.GenerateRay(static_cast<float>(normX), static_cast<float>(normY), cameraRay); //note this returns a boolean! we might want to use that
 
-			// Test if we have a valid intersection
-			bool validIntersection = m_Sphere.TestIntersection(cameraRay, intPoint, localNormal, localColor);
-			// If we have a valid intersection, change pixel color to red
-			if (validIntersection)
+			// Test for intersections with all objects in the scene
+			for (auto currentObject : m_objectList)
 			{
-				// Compute the distance between the camera and the point of intersection
-				double dist = (intPoint - cameraRay.p1).norm();
-				if (dist > maxDist)
-					maxDist = dist;
-				
-				if (dist < minDist)
-					minDist = dist;
-				
-				outputImage.SetPixel(x, y, 255.0 - ((dist - 9.0) / 0.94605) * 255.0, .0, .0);
-			}
-			else
-			{
-				outputImage.SetPixel(x, y, .0, .0, .0);
+				bool validIntersection = currentObject->TestIntersection(cameraRay, intPoint, localNormal, localColor);
+				// If we have a valid intersection, change pixel color to red
+				if (validIntersection)
+				{
+					// Compute intensity of illumination
+					double intensity;
+					qbVector<double> color{ 3 };
+					bool validIllum = false;
+					for (auto currentLight : m_lightList)
+					{
+						validIllum = currentLight->ComputeIllumination(intPoint, localNormal, m_objectList, currentObject, color, intensity);
+					}
+
+					// Compute the distance between the camera and the point of intersection
+					double dist = (intPoint - cameraRay.p1).norm();
+					if (dist > maxDist)
+						maxDist = dist;
+
+					if (dist < minDist)
+						minDist = dist;
+
+					//outputImage.SetPixel(x, y, 255.0 - ((dist - 9.0) / 0.94605) * 255.0, .0, .0);
+					if (validIllum)
+					{
+						outputImage.SetPixel(x, y, 255.0 * intensity, 0.0, 0.0); // shades of red
+					}
+					else
+					{
+						outputImage.SetPixel(x, y, 0.0, 0.0, 0.0);  // black shadow
+					}
+				}
+				else
+				{
+					outputImage.SetPixel(x, y, .0, .0, .0);
+				}
 			}
 		}
 	}
