@@ -112,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)RayTracer;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)RayTracer;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -146,6 +146,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Capp.cpp" />
     <ClCompile Include="rtRayTrace\Camera.cpp" />
+    <ClCompile Include="rtRayTrace\gtfm.cpp" />
     <ClCompile Include="rtRayTrace\LightBase.cpp" />
     <ClCompile Include="rtRayTrace\ObjectBase.cpp" />
     <ClCompile Include="rtRayTrace\objsphere.cpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="Capp.hpp" />
     <ClInclude Include="rtRayTrace\Camera.hpp" />
+    <ClInclude Include="rtRayTrace\gtfm.hpp" />
     <ClInclude Include="rtRayTrace\LightBase.hpp" />
     <ClInclude Include="rtRayTrace\ObjectBase.hpp" />
     <ClInclude Include="rtRayTrace\objsphere.hpp" />
@@ -164,7 +166,10 @@
     <ClInclude Include="rtRayTrace\Ray.hpp" />
     <ClInclude Include="rtRayTrace\rtImage.hpp" />
     <ClInclude Include="rtRayTrace\Scene.hpp" />
+    <ClInclude Include="toolbox\qbMatrix.h" />
     <ClInclude Include="toolbox\qbVector.h" />
+    <ClInclude Include="toolbox\qbVector3.hpp" />
+    <ClInclude Include="toolbox\qbVector4.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

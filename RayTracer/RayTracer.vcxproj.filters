@@ -45,6 +45,9 @@
     <ClCompile Include="rtRayTrace\pointlight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtRayTrace\gtfm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp">
@@ -75,6 +78,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rtRayTrace\pointlight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\gtfm.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="toolbox\qbMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="toolbox\qbVector3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="toolbox\qbVector4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

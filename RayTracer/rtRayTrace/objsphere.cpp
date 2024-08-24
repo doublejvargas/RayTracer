@@ -46,8 +46,12 @@ rt::ObjSphere::~ObjSphere()
 */
 bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPoint, qbVector<double> &localNormal, qbVector<double> &localColor)
 {
+	// Transform castRay into coordinate system of the sphere.
+	// For this, we use backwards transform to transform from current ray's world coordinates to local coordinates.
+	rt::Ray bckRay = m_TransformMatrix.Apply(castRay, rt::BCKTFORM);
+
 	// Compute the values of a, b and c
-	qbVector<double> vHat = castRay.lab;
+	qbVector<double> vHat = bckRay.lab;
 	vHat.Normalize();
 
 	/* Note that 'a' is equal to the squared magnitude of the direction of the cast ray. As this will be a unit vector,
@@ -55,13 +59,15 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 	*/
 	// double a = 1.0;
 
-	double b = 2.0 * qbVector<double>::dot(castRay.p1, vHat);
+	double b = 2.0 * qbVector<double>::dot(bckRay.p1, vHat);
 
-	double c = qbVector<double>::dot(castRay.p1, castRay.p1) - 1.0;
+	double c = qbVector<double>::dot(bckRay.p1, bckRay.p1) - 1.0;
 
 	// Test whether we actually have an intersection
 	double discriminant_squared = (b * b) - 4.0 * c;
 
+	// point of intersection in the LOCAL coordinate system of the sphere
+	qbVector<double> poi; 
 	if (discriminant_squared > 0.0)
 	{
 		double discriminant = sqrt(discriminant_squared);
@@ -79,19 +85,29 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 			// Determine which point of intersection was closest to the camera
 			if (t1 < t2)
 			{
-				intPoint = castRay.p1 + (vHat * t1);
+				poi = bckRay.p1 + (vHat * t1);
 			}
 			else
 			{
-				intPoint = castRay.p1 + (vHat * t2);
+				poi = bckRay.p1 + (vHat * t2);
 			}
+
+			// Transform the intersection point back into world coordinates!
+			// By doing everything in local coordinates and then simply transforming to world coordinates, we do a great number of simplifications!
+			intPoint = m_TransformMatrix.Apply(poi, rt::FWDTFORM);
 
 			// Compute the local normal
 			// Because we have a sphere located at the origin, the normal vector is
 			//  simply a vector from the origin to the point of intersection, i.e., the intersection point.
-			localNormal = intPoint;
+			qbVector<double> objOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
+			qbVector<double> newObjOrigin = m_TransformMatrix.Apply(objOrigin, rt::FWDTFORM);
+			localNormal = intPoint - newObjOrigin;
 			localNormal.Normalize();
+
+			// Return the base color
+			localColor = baseColor;
 		}
+
 		return true;
 	}
 	else

@@ -9,9 +9,38 @@ rt::Scene::Scene()
 	m_Camera.SetProjScreenWidth(0.25);
 	m_Camera.SetAspect(16.0 / 9.0);
 	m_Camera.UpdateCameraGeometry();
+	
+	// make a sphere
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
 
-	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere())); // make a sphere
-	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight())); // make a point light
+	// Modify the spheres
+	// Set transformations
+	rt::GTform matrix1, matrix2, matrix3;
+	matrix1.SetTransform(	qbVector<double>{std::vector<double>{-1.5, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.5, 0.5, 0.75}});
+
+	matrix2.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.75, 0.5, 0.5}});
+
+	matrix3.SetTransform(	qbVector<double>{std::vector<double>{1.5, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector<double>{std::vector<double>{0.75, 0.75, 0.75}});
+
+	m_objectList.at(0)->SetTransformMatrix(matrix1);
+	m_objectList.at(1)->SetTransformMatrix(matrix2);
+	m_objectList.at(2)->SetTransformMatrix(matrix3);
+	
+	// Set light color 
+	m_objectList.at(0)->baseColor = qbVector<double>{ std::vector<double>{64.0, 128.0, 200.0} };
+	m_objectList.at(1)->baseColor = qbVector<double>{ std::vector<double>{255.0, 128.0, 0.0} };
+	m_objectList.at(2)->baseColor = qbVector<double>{ std::vector<double>{255.0, 200.0, 0.0} };
+
+	// make a point light
+	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
 	m_lightList.at(0)->m_Location = qbVector<double>{ std::vector<double>{5.0, -10.0, -5.0} }; // -z value because currently the z axis is inverted in our application.
 	m_lightList.at(0)->m_Color = qbVector<double>{ std::vector<double>{255.0, 255.0, 255.0} };
 }
@@ -70,16 +99,21 @@ bool rt::Scene::Render(rtImage &outputImage)
 					//outputImage.SetPixel(x, y, 255.0 - ((dist - 9.0) / 0.94605) * 255.0, .0, .0);
 					if (validIllum)
 					{
-						outputImage.SetPixel(x, y, 255.0 * intensity, 0.0, 0.0); // shades of red
+						//outputImage.SetPixel(x, y, 255.0 * intensity, 0.0, 0.0); // shades of red
+						outputImage.SetPixel(x, y,	localColor.GetElement(0) * intensity,
+													localColor.GetElement(1) * intensity,
+													localColor.GetElement(2) * intensity);
 					}
 					else
 					{
-						outputImage.SetPixel(x, y, 0.0, 0.0, 0.0);  // black shadow
+						// Leave pixel unchanged
+						//outputImage.SetPixel(x, y, 0.0, 0.0, 0.0);  // black shadow
 					}
 				}
 				else
 				{
-					outputImage.SetPixel(x, y, .0, .0, .0);
+					// Leave pixel unchanged
+					//outputImage.SetPixel(x, y, .0, .0, .0);
 				}
 			}
 		}
