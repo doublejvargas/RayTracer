@@ -83,7 +83,7 @@ public:
 	T Determinant();
 
 	// Overload == operator.
-	bool operator== (const qbMatrix2<T> &rhs);
+	bool operator== (const qbMatrix2<T> &rhs) const;
 	bool Compare(const qbMatrix2<T> &matrix1, double tolerance);
 
 	// Overload the assignment operator.
@@ -127,7 +127,7 @@ public:
 
 private:
 	int Sub2Ind(int row, int col) const;
-	bool CloseEnough(T f1, T f2);
+	bool CloseEnough(T f1, T f2) const;
 	void SwapRow(int i, int j);
 	void MultAdd(int i, int j, T multFactor);
 	void MultRow(int i, T multFactor);
@@ -602,8 +602,17 @@ qbMatrix2<T> operator* (const qbMatrix2<T> &lhs, const qbMatrix2<T> &rhs)
 /* **************************************************************************************************
 THE == OPERATOR
 /* *************************************************************************************************/
+/* C++20 NOTE
+	Needed to add const qualifier to this function
+	Because C++20 would complain of == operator having similar conversions (C++20 seems to automatically infer operator
+	variations from your overloads, e.g., for == overloads, a == b -> !(a != b), or a == b -> b == a, etc..) (C++17 does not raise this issue)
+	so, from this list of inferred overloads, the compiler won't know which one is preferred in certain cases because they reduce to the same thing
+	making them ambiguous. So, making this const, and also making the CloseEnough() function const to avoid inconsistencies,
+	it solved the compiler's complaint. I guess because it defines an overload where both arguments are const & to qbMatrix2<T> whereas the place the overload was called,
+	namely in qbMatrix2::Inverse(), the operator is used to compare two non-const qbMatrix Objects, creating the necessary variation
+	in the list of overloaded operators the compiler sees. So, I will keep C++20 in this project moving forward. */
 template <class T>
-bool qbMatrix2<T>::operator== (const qbMatrix2<T> &rhs)
+bool qbMatrix2<T>::operator== (const qbMatrix2<T> &rhs) const
 {
 	// Check if the matricies are the same size, if not return false.
 	if ((this->m_nRows != rhs.m_nRows) || (this->m_nCols != rhs.m_nCols))
@@ -1357,8 +1366,17 @@ void qbMatrix2<T>::PrintMatrix(int precision)
 	}
 }
 
+/* C++20 NOTE
+	Needed to add const qualifier to this function
+	Because C++20 would complain of == operator having similar conversions (C++20 seems to automatically infer operator 
+	variations from your overloads, e.g., for == overloads, a == b -> !(a != b), or a == b -> b == a, etc..) (C++17 does not raise this issue)
+	so, from this list of inferred overloads, the compiler won't know which one is preferred in certain cases because they reduce to the same thing
+	making them ambiguous. So, making the original overload of the == operator const, and also making this const to avoid inconsistencies,
+	it solved the compiler's complaint. I guess because it defines an overload where both arguments are const & to qbMatrix2<T> whereas the place the overload was called,
+	namely in qbMatrix2::Inverse(), the operator is used to compare two non-const qbMatrix Objects, creating the necessary variation
+	in the list of overloaded operators the compiler sees. So, I will keep C++20 in this project moving forward. */
 template <class T>
-bool qbMatrix2<T>::CloseEnough(T f1, T f2)
+bool qbMatrix2<T>::CloseEnough(T f1, T f2) const
 {
 	return fabs(f1 - f2) < 1e-9;
 }
