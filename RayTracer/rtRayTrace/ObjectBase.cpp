@@ -21,7 +21,7 @@ bool rt::ObjectBase::TestIntersection(const Ray &castRay, qbVector<double> &intP
 
 void rt::ObjectBase::SetTransformMatrix(const rt::GTform &transformMatrix)
 {
-	m_TransformMatrix = transformMatrix;
+	transformMatrix_ = transformMatrix;
 }
 
 bool rt::ObjectBase::CloseEnough(const double f1, const double f2)

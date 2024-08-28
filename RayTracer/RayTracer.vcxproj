@@ -149,6 +149,7 @@
     <ClCompile Include="rtRayTrace\gtfm.cpp" />
     <ClCompile Include="rtRayTrace\LightBase.cpp" />
     <ClCompile Include="rtRayTrace\ObjectBase.cpp" />
+    <ClCompile Include="rtRayTrace\objplane.cpp" />
     <ClCompile Include="rtRayTrace\objsphere.cpp" />
     <ClCompile Include="rtRayTrace\pointlight.cpp" />
     <ClCompile Include="rtRayTrace\Ray.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="rtRayTrace\gtfm.hpp" />
     <ClInclude Include="rtRayTrace\LightBase.hpp" />
     <ClInclude Include="rtRayTrace\ObjectBase.hpp" />
+    <ClInclude Include="rtRayTrace\objplane.hpp" />
     <ClInclude Include="rtRayTrace\objsphere.hpp" />
     <ClInclude Include="rtRayTrace\pointlight.hpp" />
     <ClInclude Include="rtRayTrace\Ray.hpp" />

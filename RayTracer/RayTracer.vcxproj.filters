@@ -48,6 +48,9 @@
     <ClCompile Include="rtRayTrace\gtfm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtRayTrace\objplane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="toolbox\qbVector4.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\objplane.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

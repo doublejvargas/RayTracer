@@ -3,7 +3,7 @@
 rt::Scene::Scene()
 {
 	// Configure the camera 
-	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, 0.0}});
+	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, 1.0}});
 	m_Camera.SetLookAt	(qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}});
 	m_Camera.SetUpVector(qbVector<double>{std::vector<double>{0.0, 0.0, 1.0}});
 	m_Camera.SetProjScreenWidth(0.25);
@@ -11,9 +11,13 @@ rt::Scene::Scene()
 	m_Camera.UpdateCameraGeometry();
 	
 	// make a sphere
-	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
-	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
-	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere()));
+// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+
+	// make a plane
+	m_objectList.push_back(std::make_shared<rt::ObjPlane>(rt::ObjPlane{}));
+	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{128.0, 128.0, 128.0} };
 
 	// Modify the spheres
 	// Set transformations
@@ -30,14 +34,14 @@ rt::Scene::Scene()
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
 							qbVector<double>{std::vector<double>{0.75, 0.75, 0.75}});
 
-	m_objectList.at(0)->SetTransformMatrix(matrix1);
-	m_objectList.at(1)->SetTransformMatrix(matrix2);
-	m_objectList.at(2)->SetTransformMatrix(matrix3);
+// 	m_objectList.at(0)->SetTransformMatrix(matrix1);
+// 	m_objectList.at(1)->SetTransformMatrix(matrix2);
+// 	m_objectList.at(2)->SetTransformMatrix(matrix3);
 	
 	// Set light color 
-	m_objectList.at(0)->baseColor = qbVector<double>{ std::vector<double>{64.0, 128.0, 200.0} };
-	m_objectList.at(1)->baseColor = qbVector<double>{ std::vector<double>{255.0, 128.0, 0.0} };
-	m_objectList.at(2)->baseColor = qbVector<double>{ std::vector<double>{255.0, 200.0, 0.0} };
+// 	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{64.0, 128.0, 200.0} };
+// 	m_objectList.at(1)->baseColor_ = qbVector<double>{ std::vector<double>{255.0, 128.0, 0.0} };
+// 	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{255.0, 200.0, 0.0} };
 
 	// make a point light
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));

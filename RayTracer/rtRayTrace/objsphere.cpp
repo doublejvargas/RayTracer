@@ -48,7 +48,7 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 {
 	// Transform castRay into coordinate system of the sphere.
 	// For this, we use backwards transform to transform from current ray's world coordinates to local coordinates.
-	rt::Ray bckRay = m_TransformMatrix.Apply(castRay, rt::BCKTFORM);
+	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Compute the values of a, b and c
 	qbVector<double> vHat = bckRay.lab;
@@ -94,18 +94,18 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 
 			// Transform the intersection point back into world coordinates!
 			// By doing everything in local coordinates and then simply transforming to world coordinates, we do a great number of simplifications!
-			intPoint = m_TransformMatrix.Apply(poi, rt::FWDTFORM);
+			intPoint = transformMatrix_.Apply(poi, rt::FWDTFORM);
 
 			// Compute the local normal
 			// Because we have a sphere located at the origin, the normal vector is
 			//  simply a vector from the origin to the point of intersection, i.e., the intersection point.
 			qbVector<double> objOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
-			qbVector<double> newObjOrigin = m_TransformMatrix.Apply(objOrigin, rt::FWDTFORM);
+			qbVector<double> newObjOrigin = transformMatrix_.Apply(objOrigin, rt::FWDTFORM);
 			localNormal = intPoint - newObjOrigin;
 			localNormal.Normalize();
 
 			// Return the base color
-			localColor = baseColor;
+			localColor = baseColor_;
 		}
 
 		return true;

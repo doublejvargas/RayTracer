@@ -4,6 +4,7 @@
 #include "Camera.hpp"
 #include "objsphere.hpp"
 #include "pointlight.hpp"
+#include "objplane.hpp"
 
 // lib
 #include <vector>

@@ -28,7 +28,7 @@ namespace rt
 
 	// Public member variables
 	public:
-		qbVector<double> baseColor{ 3 };
-		rt::GTform m_TransformMatrix;
+		qbVector<double> baseColor_{ 3 };
+		rt::GTform transformMatrix_;
 	};
 }
