@@ -16,25 +16,28 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 										qbVector<double> &localColor)
 {
 	// Copy the ray and apply the backwards transform
+	// this is the ^l in ^l = ^a + ^kt
 	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Copy the m_lab vector from bckRay and normalize it
 	qbVector<double> k = bckRay.lab;
-	k.Normalize();
+	k.Normalize(); // unit vector ^k from the line equation above
 
 	/* Check if there is an intersection, ie. if the castRay is not parallel to the plane
-		NOTE: this means parallel because the plane is the XY plane (where Z is 0 always),
+		NOTE: kz being = 0 means parallel because the plane is the XY plane (where Z is 0 always),
 		so, any vector that is parallel to this plane, will have a Z-component of 0, ie, element at index 2 of a qbVector{3} will be zero */
 	if (!CloseEnough(k.GetElement(2), 0.0))
 	{
-		// If above condition true: there is an intersection bc vector is not parallel to plane
+		// If above condition true: there is an intersection because vector is not parallel to plane
 
 		/* Eq for a plane:
 		*	^x = ^po + ^po1*u + ^po2*v, where ^po, ^po1 and ^po2 are points (3-component vectors) that define the plane, and u and v are scalars that define points along the plane 
 		*  Eq for a line:
-		*	 ^l = ^a + ^kt, where ^a is a point in space and ^k is a unit vector in the direction of the line, and t is a scalar representing points along the line.
+		*	 ^l = ^a + ^kt, where ^a is a point on the line (typically the starting point, but not necessary)  and ^k is a unit vector indicating the direction of the line, 
+				and t is a scalar used to obtain different points along the line.
 		*  Eq for intersection:
 		*	 ^a + ^kt = ^po + ^po1*u + ^po2*v
+		* -> ^a = ^po + ^po1*u + ^po2*v + (-^k*t)
 		* 
 		*  Since we define all of our objects to be in their own local coordinate system, we can fix our plane to lie in the XY plane and to be centered at the origin, making
 		*		^po =  [0 0 0] (origin)
@@ -42,9 +45,14 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 		*		^po2 = [0 1 0] (vector pointing in y dir)
 		* 
 		*  Then, we rewrite the intersection equation to:
-		*		^a =  |1| +  |0|
-		*			 u|0| + v|1| - ^kt
-		*			  |0|    |0|
+		* 
+		*		^a = | -^k ^po1 ^po2| * |t|     (since po is the origin (0, 0, 0) it cancels out of the equation)
+		*								|u|
+		*								|v|
+		*  Which simplifies to:
+		*		^a =  |1| +  |0|	|kx|
+		*			 u|0| + v|1| - t|ky|
+		*			  |0|    |0|	|kz|
 		* 
 		*	or: ax = u - kx * t
 		*		ay = v -ky * t
@@ -54,6 +62,7 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 		*		t = az / -kz
 		* 
 		*	This is the value that we compute below:
+		*	bckRay.p1 is equivalent to ^a in the line equation
 		*/
 		double t = bckRay.p1.GetElement(2) / -k.GetElement(2);
 
@@ -72,8 +81,8 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 			if ((abs(u) < 1.0) && (abs(v) < 1.0))
 			{
 				// Compute the point of intersection
-				// poi = ^a + ^k * t
-				qbVector<double> poi = bckRay.p1 + (k * t);
+				// poi = ^a + ^kt (remember, general equation for a line, and we have computed t!)
+				qbVector<double> poi = bckRay.p1 + (t * k);
 
 				// Transform the intersection point back into world coordinates
 				intPoint = transformMatrix_.Apply(poi, rt::FWDTFORM);

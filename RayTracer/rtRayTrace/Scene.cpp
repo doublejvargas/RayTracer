@@ -3,7 +3,7 @@
 rt::Scene::Scene()
 {
 	// Configure the camera 
-	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, 1.0}});
+	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, -1.0}});
 	m_Camera.SetLookAt	(qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}});
 	m_Camera.SetUpVector(qbVector<double>{std::vector<double>{0.0, 0.0, 1.0}});
 	m_Camera.SetProjScreenWidth(0.25);
