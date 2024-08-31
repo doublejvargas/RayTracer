@@ -29,6 +29,7 @@ public:
 private:
 	uint32_t ConvertColor(const double red, const double green, const double blue);
 	void InitTexture();
+	void ComputeMaxValues();
 
 private:
 	// 2D arrays to store image data
@@ -38,6 +39,9 @@ private:
 
 	// Store dimensions of the image
 	int m_Width, m_Height;
+
+	// Store the maximum color values
+	double m_maxRed, m_maxGreen, m_maxBlue, m_overallMax;
 
 	// SDL2 stuff
 	SDL_Renderer *m_pRenderer;

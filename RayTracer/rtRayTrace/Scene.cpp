@@ -11,20 +11,26 @@ rt::Scene::Scene()
 	m_Camera.UpdateCameraGeometry();
 	
 	// make a sphere
-// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
-// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
-// 	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
+	m_objectList.push_back(std::make_shared<rt::ObjSphere>(rt::ObjSphere{}));
 
 	// make a plane
 	m_objectList.push_back(std::make_shared<rt::ObjPlane>(rt::ObjPlane{}));
-	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{128.0, 128.0, 128.0} };
+	m_objectList.at(3)->baseColor_ = qbVector<double>{ std::vector<double>{0.5, 0.5, 0.5} };
+
+	rt::GTform planeTransform;
+	planeTransform.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.75}},
+									qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
+									qbVector<double>{std::vector<double>{4.0, 4.0, 1.0}});
+	m_objectList.at(3)->SetTransformMatrix(planeTransform);
 
 	// Modify the spheres
 	// Set transformations
 	rt::GTform matrix1, matrix2, matrix3;
-	matrix1.SetTransform(	qbVector<double>{std::vector<double>{-1.5, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.5, 0.5, 0.75}});
+	matrix1.SetTransform(	qbVector<double>{std::vector<double>{-1.5, 0.0, 0.0}}, // translation
+							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},  // rotation
+							qbVector<double>{std::vector<double>{0.5, 0.5, 0.75}}); // scaling
 
 	matrix2.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
@@ -34,19 +40,27 @@ rt::Scene::Scene()
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
 							qbVector<double>{std::vector<double>{0.75, 0.75, 0.75}});
 
-// 	m_objectList.at(0)->SetTransformMatrix(matrix1);
-// 	m_objectList.at(1)->SetTransformMatrix(matrix2);
-// 	m_objectList.at(2)->SetTransformMatrix(matrix3);
+ 	m_objectList.at(0)->SetTransformMatrix(matrix1);
+ 	m_objectList.at(1)->SetTransformMatrix(matrix2);
+ 	m_objectList.at(2)->SetTransformMatrix(matrix3);
 	
 	// Set light color 
-// 	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{64.0, 128.0, 200.0} };
-// 	m_objectList.at(1)->baseColor_ = qbVector<double>{ std::vector<double>{255.0, 128.0, 0.0} };
-// 	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{255.0, 200.0, 0.0} };
+	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
+	m_objectList.at(1)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.5, 0.0} };
+	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
 
-	// make a point light
+	// Make point lights
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
 	m_lightList.at(0)->m_Location = qbVector<double>{ std::vector<double>{5.0, -10.0, -5.0} }; // -z value because currently the z axis is inverted in our application.
-	m_lightList.at(0)->m_Color = qbVector<double>{ std::vector<double>{255.0, 255.0, 255.0} };
+	m_lightList.at(0)->m_Color = qbVector<double>{ std::vector<double>{0.0, 0.0, 1.0} };
+
+	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
+	m_lightList.at(1)->m_Location = qbVector<double>{ std::vector<double>{-5.0, -10.0, -5.0} };
+	m_lightList.at(1)->m_Color = qbVector<double>{ std::vector<double>{1.0, 0.0, 0.0} };
+	
+	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
+	m_lightList.at(2)->m_Location = qbVector<double>{ std::vector<double>{0.0, -10.0, -5.0} };
+	m_lightList.at(2)->m_Color = qbVector<double>{ std::vector<double>{0.0, 1.0, 0.0} };
 }
 
 bool rt::Scene::Render(rtImage &outputImage)
@@ -77,54 +91,71 @@ bool rt::Scene::Render(rtImage &outputImage)
 			m_Camera.GenerateRay(static_cast<float>(normX), static_cast<float>(normY), cameraRay); //note this returns a boolean! we might want to use that
 
 			// Test for intersections with all objects in the scene
+			std::shared_ptr<rt::ObjectBase> closestObject;
+			qbVector<double> closestIntPoint{ 3 };
+			qbVector<double> closestLocalNormal{ 3 };
+			qbVector<double> closestLocalColor{ 3 };
+			double minDist = 1e6;
+			bool intersectionFound = false;
 			for (auto currentObject : m_objectList)
 			{
-				bool validIntersection = currentObject->TestIntersection(cameraRay, intPoint, localNormal, localColor);
-				// If we have a valid intersection, change pixel color to red
-				if (validIntersection)
+				bool validInt = currentObject->TestIntersection(cameraRay, intPoint, localNormal, localColor);
+
+				//If we have a valid intersection
+				if (validInt)
 				{
-					// Compute intensity of illumination
-					double intensity;
-					qbVector<double> color{ 3 };
-					bool validIllum = false;
-					for (auto currentLight : m_lightList)
-					{
-						validIllum = currentLight->ComputeIllumination(intPoint, localNormal, m_objectList, currentObject, color, intensity);
-					}
+					// Set the flag to indicate that we found an intersection
+					intersectionFound = true;
 
-					// Compute the distance between the camera and the point of intersection
+					// Compute distance between the camera and the point of intersection
 					double dist = (intPoint - cameraRay.p1).norm();
-					if (dist > maxDist)
-						maxDist = dist;
 
+					/* If this object is closer to the camera than any one that we have
+					   seen before, then store a reference to it */
 					if (dist < minDist)
+					{
 						minDist = dist;
-
-					//outputImage.SetPixel(x, y, 255.0 - ((dist - 9.0) / 0.94605) * 255.0, .0, .0);
-					if (validIllum)
-					{
-						//outputImage.SetPixel(x, y, 255.0 * intensity, 0.0, 0.0); // shades of red
-						outputImage.SetPixel(x, y,	localColor.GetElement(0) * intensity,
-													localColor.GetElement(1) * intensity,
-													localColor.GetElement(2) * intensity);
-					}
-					else
-					{
-						// Leave pixel unchanged
-						//outputImage.SetPixel(x, y, 0.0, 0.0, 0.0);  // black shadow
+						closestObject = currentObject;
+						closestIntPoint = intPoint;
+						closestLocalNormal = localNormal;
+						closestLocalColor = localColor;
 					}
 				}
-				else
+			}
+			/* Compute the illumination for the closest object, assuming that there
+			   was a valid intersection */
+			if (intersectionFound)
+			{
+				// Compute the intensity of illumination
+				double intensity;
+				qbVector<double> color{ 3 };
+				double red = 0.0;
+				double green = 0.0;
+				double blue = 0.0;
+				bool validIllum = false;
+				bool illumFound = false;
+				for (auto currentLight : m_lightList)
 				{
-					// Leave pixel unchanged
-					//outputImage.SetPixel(x, y, .0, .0, .0);
+					validIllum = currentLight->ComputeIllumination(closestIntPoint, closestLocalNormal, m_objectList, closestObject, color, intensity);
+					if (validIllum)
+					{
+						illumFound = true;
+						red += color.GetElement(0) * intensity;
+						green += color.GetElement(1) * intensity;
+						blue += color.GetElement(2) * intensity;
+					}
+				}
+
+				if (illumFound)
+				{
+					red *= closestLocalColor.GetElement(0);
+					green *= closestLocalColor.GetElement(1);
+					blue *= closestLocalColor.GetElement(2);
+					outputImage.SetPixel(x, y, red, green, blue);
 				}
 			}
 		}
 	}
-
-	std::cout << "Minimum distance: " << minDist << std::endl;
-	std::cout << "Maximum distance: " << maxDist << std::endl;
 
 	return true;
 }

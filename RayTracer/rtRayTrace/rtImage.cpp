@@ -39,6 +39,9 @@ void rtImage::SetPixel(const int x, const int y, const double r, const double g,
 
 void rtImage::Display()
 {
+	// Compute maximum color values
+	ComputeMaxValues();
+
 	// ALlocate memory for a pixel buffer (why not use malloc/calloc?)
 	//uint32_t *tempPixels = new uint32_t[(size_t)Width * Height];
 
@@ -76,9 +79,9 @@ void rtImage::Display()
 uint32_t rtImage::ConvertColor(const double red, const double green, const double blue)
 {
 	// Convert colors to unsigned integers
-	unsigned char r = static_cast<unsigned char>(red);
-	unsigned char g = static_cast<unsigned char>(green);
-	unsigned char b = static_cast<unsigned char>(blue);
+	unsigned char r = static_cast<unsigned char>((red / m_overallMax) * 255.0);
+	unsigned char g = static_cast<unsigned char>((green / m_overallMax) * 255.0);
+	unsigned char b = static_cast<unsigned char>((blue / m_overallMax) * 255.0);
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	uint32_t pixelColor = (r << 24) + (g << 16) + (b << 8) + 255;
@@ -112,5 +115,40 @@ void rtImage::InitTexture()
 	SDL_Surface *tempSurface = SDL_CreateRGBSurface(0, m_Width, m_Height, 32, rmask, gmask, bmask, amask);
 	m_pTexture = SDL_CreateTextureFromSurface(m_pRenderer, tempSurface);
 	SDL_FreeSurface(tempSurface);
+}
+
+void rtImage::ComputeMaxValues()
+{
+	m_maxRed = 0.0;
+	m_maxGreen = 0.0;
+	m_maxBlue = 0.0;
+	m_overallMax = 0.0;
+	for (int x = 0; x < m_Width; x++)
+	{
+		for (int y = 0; y < m_Height; y++)
+		{
+			double redValue		= m_rChannel.at(x).at(y);
+			double greenValue	= m_gChannel.at(x).at(y);
+			double blueValue	= m_bChannel.at(x).at(y);
+
+			if (redValue > m_maxRed)
+				m_maxRed = redValue;
+
+			if (greenValue > m_maxGreen)
+				m_maxGreen = greenValue;
+
+			if (blueValue > m_maxBlue)
+				m_maxBlue = blueValue;
+
+			if (m_maxRed > m_overallMax)
+				m_overallMax = m_maxRed;
+
+			if (m_maxGreen > m_overallMax)
+				m_overallMax = m_maxGreen;
+
+			if (m_maxBlue > m_overallMax)
+				m_overallMax = m_maxBlue;
+		}
+	}
 }
 
