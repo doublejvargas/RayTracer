@@ -20,6 +20,14 @@ namespace rt
 
 		// Function to perform rendering
 		bool Render(rtImage &outputImage);
+
+		// Function to cast a ray into the scene
+		bool CastRay(	rt::Ray &castRay,
+						std::shared_ptr<rt::ObjectBase> &closestObject,
+						qbVector<double> &closestIntPoint,
+						qbVector<double> &closestLocalNormal,
+						qbVector<double> &closestLocalColor 
+					);
 	
 	// Private methods
 	private:

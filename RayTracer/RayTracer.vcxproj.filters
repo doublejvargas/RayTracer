@@ -51,6 +51,12 @@
     <ClCompile Include="rtRayTrace\rtPrimitives\objplane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rtRayTrace\rtMaterials\MaterialBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rtRayTrace\rtMaterials\simplematerial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capp.hpp">
@@ -96,6 +102,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rtRayTrace\rtPrimitives\objplane.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\rtMaterials\MaterialBase.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtRayTrace\rtMaterials\simplematerial.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

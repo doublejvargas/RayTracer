@@ -1,7 +1,16 @@
 #include "Scene.hpp"
+#include "rtMaterials/simplematerial.hpp"
 
 rt::Scene::Scene()
 {
+	// Create some materials
+	auto material = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
+
+	// Set up the materials
+	material->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
+	material->reflectivity_ = 0.5;
+	material->shininess_ = 10.0;
+
 	// Configure the camera 
 	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, -1.0}});
 	m_Camera.SetLookAt	(qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}});
@@ -30,24 +39,27 @@ rt::Scene::Scene()
 	rt::GTform matrix1, matrix2, matrix3;
 	matrix1.SetTransform(	qbVector<double>{std::vector<double>{-1.5, 0.0, 0.0}}, // translation
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},  // rotation
-							qbVector<double>{std::vector<double>{0.5, 0.5, 0.75}}); // scaling
+							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}}); // scaling
 
 	matrix2.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.75, 0.5, 0.5}});
+							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}});
 
 	matrix3.SetTransform(	qbVector<double>{std::vector<double>{1.5, 0.0, 0.0}},
 							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.75, 0.75, 0.75}});
+							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}});
 
  	m_objectList.at(0)->SetTransformMatrix(matrix1);
  	m_objectList.at(1)->SetTransformMatrix(matrix2);
  	m_objectList.at(2)->SetTransformMatrix(matrix3);
 	
-	// Set light color 
+	// Set spheres base color 
 	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
 	m_objectList.at(1)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.5, 0.0} };
 	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
+
+	// Assign materials to objects
+	m_objectList.at(0)->AssignMaterial(material);
 
 	// Make point lights
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
@@ -95,67 +107,74 @@ bool rt::Scene::Render(rtImage &outputImage)
 			qbVector<double> closestIntPoint	{ 3 };
 			qbVector<double> closestLocalNormal	{ 3 };
 			qbVector<double> closestLocalColor	{ 3 };
-			double minDist = 1e6;
-			bool intersectionFound = false;
-			for (auto currentObject : m_objectList)
-			{
-				bool validInt = currentObject->TestIntersection(cameraRay, intPoint, localNormal, localColor);
-
-				//If we have a valid intersection
-				if (validInt)
-				{
-					// Set the flag to indicate that we found an intersection
-					intersectionFound = true;
-
-					// Compute distance between the camera and the point of intersection
-					double dist = (intPoint - cameraRay.p1).norm();
-
-					/* If this object is closer to the camera than any one that we have
-					   seen before, then store a reference to it */
-					if (dist < minDist)
-					{
-						minDist = dist;
-						closestObject = currentObject;
-						closestIntPoint = intPoint;
-						closestLocalNormal = localNormal;
-						closestLocalColor = localColor;
-					}
-				}
-			}
+			bool intersectionFound = CastRay(cameraRay, closestObject, closestIntPoint, closestLocalNormal, closestLocalColor);
+			
 			/* Compute the illumination for the closest object, assuming that there
 			   was a valid intersection */
 			if (intersectionFound)
 			{
-				// Compute the intensity of illumination
-				double intensity;
-				qbVector<double> color{ 3 };
-				double red = 0.0;
-				double green = 0.0;
-				double blue = 0.0;
-				bool validIllum = false;
-				bool illumFound = false;
-				for (auto currentLight : m_lightList)
+				// Check if object has a material
+				if (closestObject->m_hasMaterial)
 				{
-					validIllum = currentLight->ComputeIllumination(closestIntPoint, closestLocalNormal, m_objectList, closestObject, color, intensity);
-					if (validIllum)
-					{
-						illumFound = true;
-						red += color.GetElement(0) * intensity;
-						green += color.GetElement(1) * intensity;
-						blue += color.GetElement(2) * intensity;
-					}
-				}
+					// Use material to compute color
+					qbVector<double> color = closestObject->m_pMaterial->ComputeColor(m_objectList, m_lightList, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
 
-				if (illumFound)
+					outputImage.SetPixel(x, y, color.GetElement(0), color.GetElement(1), color.GetElement(2));
+				}
+				else
 				{
-					red *= closestLocalColor.GetElement(0);
-					green *= closestLocalColor.GetElement(1);
-					blue *= closestLocalColor.GetElement(2);
-					outputImage.SetPixel(x, y, red, green, blue);
+					// Use basic method to compute color
+					qbVector<double> matColor = rt::MaterialBase::ComputeDiffuseColor(	m_objectList, m_lightList,
+																						closestObject, closestIntPoint, 
+																						closestLocalNormal, closestObject->baseColor_
+																					 );
+
+					outputImage.SetPixel(x, y, matColor.GetElement(0), matColor.GetElement(1), matColor.GetElement(2));
 				}
 			}
 		}
 	}
 
 	return true;
+}
+
+bool rt::Scene::CastRay(	rt::Ray &castRay, 
+							std::shared_ptr<rt::ObjectBase> &closestObject,
+							qbVector<double> &closestIntPoint,
+							qbVector<double> &closestLocalNormal, 
+							qbVector<double> &closestLocalColor
+						)
+{
+	qbVector<double> intPoint	{ 3 };
+	qbVector<double> localNormal{ 3 };
+	qbVector<double> localColor	{ 3 };
+	double minDist = 1e6;
+	bool intersectionFound = false;
+	for (auto currentObject : m_objectList)
+	{
+		bool validInt = currentObject->TestIntersection(castRay, intPoint, localNormal, localColor);
+
+		//If we have a valid intersection
+		if (validInt)
+		{
+			// Set the flag to indicate that we found an intersection
+			intersectionFound = true;
+
+			// Compute distance between the camera and the point of intersection
+			double dist = (intPoint - castRay.p1).norm();
+
+			/* If this object is closer to the camera than any one that we have
+			   seen before, then store a reference to it */
+			if (dist < minDist)
+			{
+				minDist = dist;
+				closestObject = currentObject;
+				closestIntPoint = intPoint;
+				closestLocalNormal = localNormal;
+				closestLocalColor = localColor;
+			}
+		}
+	}
+
+	return intersectionFound;
 }

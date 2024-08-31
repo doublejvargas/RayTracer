@@ -148,6 +148,8 @@
     <ClCompile Include="rtRayTrace\Camera.cpp" />
     <ClCompile Include="rtRayTrace\gtfm.cpp" />
     <ClCompile Include="rtRayTrace\rtLights\LightBase.cpp" />
+    <ClCompile Include="rtRayTrace\rtMaterials\MaterialBase.cpp" />
+    <ClCompile Include="rtRayTrace\rtMaterials\simplematerial.cpp" />
     <ClCompile Include="rtRayTrace\rtPrimitives\ObjectBase.cpp" />
     <ClCompile Include="rtRayTrace\rtPrimitives\objplane.cpp" />
     <ClCompile Include="rtRayTrace\rtPrimitives\objsphere.cpp" />
@@ -161,6 +163,8 @@
     <ClInclude Include="rtRayTrace\Camera.hpp" />
     <ClInclude Include="rtRayTrace\gtfm.hpp" />
     <ClInclude Include="rtRayTrace\rtLights\LightBase.hpp" />
+    <ClInclude Include="rtRayTrace\rtMaterials\MaterialBase.hpp" />
+    <ClInclude Include="rtRayTrace\rtMaterials\simplematerial.hpp" />
     <ClInclude Include="rtRayTrace\rtPrimitives\ObjectBase.hpp" />
     <ClInclude Include="rtRayTrace\rtPrimitives\objplane.hpp" />
     <ClInclude Include="rtRayTrace\rtPrimitives\objsphere.hpp" />
