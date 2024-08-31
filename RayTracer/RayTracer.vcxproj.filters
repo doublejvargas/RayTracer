@@ -33,22 +33,22 @@
     <ClCompile Include="rtRayTrace\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtRayTrace\ObjectBase.cpp">
+    <ClCompile Include="rtRayTrace\rtPrimitives\ObjectBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtRayTrace\objsphere.cpp">
+    <ClCompile Include="rtRayTrace\rtPrimitives\objsphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtRayTrace\LightBase.cpp">
+    <ClCompile Include="rtRayTrace\rtLights\LightBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtRayTrace\pointlight.cpp">
+    <ClCompile Include="rtRayTrace\rtLights\pointlight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rtRayTrace\gtfm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtRayTrace\objplane.cpp">
+    <ClCompile Include="rtRayTrace\rtPrimitives\objplane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,16 +71,16 @@
     <ClInclude Include="rtRayTrace\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rtRayTrace\ObjectBase.hpp">
+    <ClInclude Include="rtRayTrace\rtPrimitives\ObjectBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rtRayTrace\objsphere.hpp">
+    <ClInclude Include="rtRayTrace\rtPrimitives\objsphere.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rtRayTrace\LightBase.hpp">
+    <ClInclude Include="rtRayTrace\rtLights\LightBase.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rtRayTrace\pointlight.hpp">
+    <ClInclude Include="rtRayTrace\rtLights\pointlight.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rtRayTrace\gtfm.hpp">
@@ -95,7 +95,7 @@
     <ClInclude Include="toolbox\qbVector4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rtRayTrace\objplane.hpp">
+    <ClInclude Include="rtRayTrace\rtPrimitives\objplane.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

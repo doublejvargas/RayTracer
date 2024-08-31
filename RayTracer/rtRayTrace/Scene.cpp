@@ -71,9 +71,9 @@ bool rt::Scene::Render(rtImage &outputImage)
 
 	// Loop over each pixel in our image
 	rt::Ray cameraRay;
-	qbVector<double> intPoint	(3);
-	qbVector<double> localNormal(3);
-	qbVector<double> localColor	(3);
+	qbVector<double> intPoint	{3};
+	qbVector<double> localNormal{3};
+	qbVector<double> localColor	{3};
 	// used to normalize the pixels from our typical dimensions (eg 1280 x 720) to range between [0, 1].
 	double xFactor = 1.0 / (static_cast<double>(width) / 2.0);	// [0, 2]
 	double yFactor = 1.0 / (static_cast<double>(height) / 2.0); // [0, 2]
@@ -92,9 +92,9 @@ bool rt::Scene::Render(rtImage &outputImage)
 
 			// Test for intersections with all objects in the scene
 			std::shared_ptr<rt::ObjectBase> closestObject;
-			qbVector<double> closestIntPoint{ 3 };
-			qbVector<double> closestLocalNormal{ 3 };
-			qbVector<double> closestLocalColor{ 3 };
+			qbVector<double> closestIntPoint	{ 3 };
+			qbVector<double> closestLocalNormal	{ 3 };
+			qbVector<double> closestLocalColor	{ 3 };
 			double minDist = 1e6;
 			bool intersectionFound = false;
 			for (auto currentObject : m_objectList)

@@ -2,9 +2,9 @@
 
 #include "rtImage.hpp"
 #include "Camera.hpp"
-#include "objsphere.hpp"
-#include "pointlight.hpp"
-#include "objplane.hpp"
+#include "rtPrimitives/objsphere.hpp"
+#include "rtPrimitives/objplane.hpp"
+#include "rtLights/pointlight.hpp"
 
 // lib
 #include <vector>
