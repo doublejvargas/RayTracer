@@ -147,6 +147,7 @@
     <ClCompile Include="Capp.cpp" />
     <ClCompile Include="rtRayTrace\Camera.cpp" />
     <ClCompile Include="rtRayTrace\gtfm.cpp" />
+    <ClCompile Include="rtRayTrace\ReflectionScene.cpp" />
     <ClCompile Include="rtRayTrace\rtLights\LightBase.cpp" />
     <ClCompile Include="rtRayTrace\rtMaterials\MaterialBase.cpp" />
     <ClCompile Include="rtRayTrace\rtMaterials\simplematerial.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Capp.hpp" />
     <ClInclude Include="rtRayTrace\Camera.hpp" />
     <ClInclude Include="rtRayTrace\gtfm.hpp" />
+    <ClInclude Include="rtRayTrace\ReflectionScene.hpp" />
     <ClInclude Include="rtRayTrace\rtLights\LightBase.hpp" />
     <ClInclude Include="rtRayTrace\rtMaterials\MaterialBase.hpp" />
     <ClInclude Include="rtRayTrace\rtMaterials\simplematerial.hpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="rtRayTrace\rtLights\pointlight.hpp" />
     <ClInclude Include="rtRayTrace\Ray.hpp" />
     <ClInclude Include="rtRayTrace\rtImage.hpp" />
+    <ClInclude Include="rtRayTrace\rtUtils.hpp" />
     <ClInclude Include="rtRayTrace\Scene.hpp" />
     <ClInclude Include="toolbox\qbMatrix.h" />
     <ClInclude Include="toolbox\qbVector.h" />
