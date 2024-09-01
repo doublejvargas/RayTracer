@@ -6,6 +6,7 @@ Capp::Capp()
 	m_isRunning = true;
 	m_pWindow = nullptr;
 	m_pRenderer = nullptr;
+	m_threadCounter = new std::atomic<int>(0); // Must delete this!
 }
 
 bool Capp::OnInit()
@@ -19,6 +20,7 @@ bool Capp::OnInit()
 	m_pWindow = SDL_CreateWindow("Multi threaded RayTracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, SDL_WINDOW_SHOWN);
 	if (m_pWindow)
 	{
+		std::cout << "Created window successfully, dims: " << m_Width << " x " << m_Height << std::endl;
 		m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, 0);
 
 		/* Instead of initializing the image, we now initialize the scene with
@@ -32,6 +34,16 @@ bool Capp::OnInit()
 			std::cout << "Failed to generate tile grid" << std::endl;
 			return false;
 		}
+
+		std::cout << "Generated grid of tiles successfully, size: " << m_Tiles.size() << std::endl;
+
+		// Initialize the thread counter
+		// Since my cpu has 6 cores (12 available cpus), I will set the max number of threads to be 12
+		m_maxThreads = 12;
+		// Stores the value "0" into m_threadCounter in a * THREAD-SAFE * way, guaranteeing that it will not
+		//  interfere or cause issues if the variable is accessed concurrently.
+		// To write using the std::atomic library, we use the store method with the std::memory_order_release flag.
+		m_threadCounter->store(0, std::memory_order_release);
 
 		// Set background to white
 		SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
@@ -80,6 +92,7 @@ void Capp::OnEvent(SDL_Event *event)
 {
 	if (event->type == SDL_QUIT)
 	{
+		std::cout << "Exiting application...\n";
 		m_isRunning = false;
 	}
 }
@@ -98,23 +111,48 @@ void Capp::OnEvent(SDL_Event *event)
 */
 void Capp::OnLoop()
 {	
-	// Loop through all tiles and find the first one that hasn't been rendered yet
+	//// Loop through all tiles and find the first one that hasn't been rendered yet
+	//for (int i = 0; i < m_Tiles.size(); i++)
+	//{
+	//	if (m_tileFlags.at(i) == 0)
+	//	{
+	//		// This tile has not been rendered, so render it now
+	//		m_Scene.RenderTile(&m_Tiles.at(i));
+
+	//		// Set the tile flag to indicate that this tile has been rendered
+	//		m_tileFlags.at(i) = 2;
+
+	//		// Once complete, break out of the loop
+	//		// This is temporary and will be removed once we implement multi-threading
+	//		break;
+	//	}
+	//}
+
 	for (int i = 0; i < m_Tiles.size(); i++)
 	{
-		if (m_tileFlags.at(i) == 0)
+		// If tile i is waiting to be rendered
+		if (m_tileFlags.at(i)->load(std::memory_order_acquire) == 0) //To access using the std::atomic library, we use the load method with the std::memory_order_acquire flag
 		{
-			// This tile has not been rendered, so render it now
-			m_Scene.RenderTile(&m_Tiles.at(i));
-
-			// Set the tile flag to indicate that this tile has been rendered
-			m_tileFlags.at(i) = 2;
-
-			// Once complete, break out of the loop
-			// This is temporary and will be removed once we implement multi-threading
-			break;
+			// Check if any threads are available
+			if (m_threadCounter->load(std::memory_order_acquire) < m_maxThreads)
+			{
+				// We have a thread available, so launch it to render this tile
+				int numActiveThreads = m_threadCounter->load(std::memory_order_acquire);
+				m_threadCounter->store(numActiveThreads + 1, std::memory_order_release);
+				// Actual thread created here, remember that the thread is created by passing an executable 
+				//  -- in this case, I passed a reference to the RederTile method from CApp.hpp -- along with
+				//  all the arguments that the executable requires, in this case it would be a pointer to a tile,
+				//  an std::atomic<int> pointer to the thread counter and an std::atomic<int> pointer to the tile flag.
+				//  Why do we pass a pointer to this instance to the thread constructor?
+				std::thread renderThread(&Capp::RenderTile, this, &m_Tiles.at(i), m_threadCounter, m_tileFlags.at(i));
+				/* Using renderThread.join() here would spawn the 12 threads and then wait for all of them to finish before spawning the next 12
+				    this would be an inefficient use of threads for this application. Instead, we want to spawn threads which will execute immediately,
+					finish, and immediately spawn a new thread as soon as available to render a tile that is waiting to be rendered. For that use case,
+					we use renderThread.detach() */
+				renderThread.detach();
+			}
 		}
 	}
-	
 }
 
 void Capp::OnRender()
@@ -139,7 +177,7 @@ void Capp::OnRender()
 	// Render the tiles
 	for (int i = 0; i < m_Tiles.size(); i++)
 	{
-		if (m_tileFlags.at(i) == 2)
+		if (m_tileFlags.at(i)->load(std::memory_order_acquire) == 2)
 		{
 			SDL_Rect srcRect, dstRect;
 			srcRect.x = 0;
@@ -172,10 +210,23 @@ void Capp::OnRender()
 
 void Capp::OnExit()
 {
+	std::cout << "OnExit called, Cleaning up resources\n";
 	// Tidy up the tile grid
 	bool result = DestroyTileGrid();
 
-	// TIdy up SDL2 stuff
+	/* Delete heap allocated variables */
+	// Delete thread counter
+	delete m_threadCounter;
+	m_threadCounter = nullptr;
+
+	// Delete heap-allocated flags
+	for (int i = 0; i < m_tileFlags.size(); i++)
+	{
+		delete m_tileFlags.at(i);
+		m_tileFlags.at(i) = nullptr;
+	}
+
+	// Tidy up SDL2 stuff
 	SDL_DestroyRenderer(m_pRenderer);
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = nullptr;
@@ -238,7 +289,7 @@ bool Capp::GenerateTileGrid(int tileWidth, int tileHeight)
 	// Set all the tile flags to zero
 	for (int i = 0; i < m_Tiles.size(); i++)
 	{
-		m_tileFlags.push_back(0);
+		m_tileFlags.push_back(new std::atomic<int>(0)); // Must delete these!!
 	}
 	
 	// Tidy up before returning
@@ -254,6 +305,7 @@ bool Capp::DestroyTileGrid()
 			SDL_DestroyTexture(m_Tiles.at(i).pTexture);
 	}
 
+	std::cout << "Successfully destroyed Grid of Tiles\n";
 	return true;
 }
 
@@ -306,3 +358,27 @@ uint32_t Capp::ConvertColor(const double red, const double green, const double b
 	return pixelColor;
 }
 
+void Capp::RenderTile(rt::DATA::tile *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag)
+{
+	/* This piece of code demonstrates the importance of using std::atomic for tileFlag, as we see that
+	   this variable is modified multiple times in this method, and we know that the variable is also being 
+	   read from by various threads in the OnLoop method, all this is happening concurrently. Using std::atomic
+	   guarantees that there will be no race conditions when writing to or reading from tileFlags */
+	tileFlag->store(1, std::memory_order_release); // flag value of 1 indicates that the tile is being rendered
+	// In order to be able to access m_Scene from the thread, we pass an instance of the Capp object (this) 
+	// when spawning the thread (see the construction of renderThread in OnLoop method, around line 143)
+	m_Scene.RenderTile(tile);
+	int numActiveThreads = threadCounter->load(std::memory_order_acquire);
+	// Decrement number of active threads once finished rendering, making thread available to render waiting tiles.
+	threadCounter->store(numActiveThreads - 1, std::memory_order_release);
+	tileFlag->store(2, std::memory_order_release); // flag value of 2 indicates that the tile has completed rendering
+}
+
+void Capp::ResetTileFlags()
+{
+	for (int i = 0; i < m_Tiles.size(); i++)
+	{
+		m_tileFlags.at(i)->store(0, std::memory_order_release);
+		m_Tiles.at(i).textureComplete = false;
+	}
+}

@@ -6,7 +6,12 @@
 #include"Camera.hpp"
 #include "rtUtils.hpp"
 
-#include "toolbox/qbVector.h"
+// tools
+#include "toolbox/qbVector3.hpp"
+
+// lib
+#include <thread>
+#include <atomic>
 
 
 class Capp
@@ -21,6 +26,9 @@ public:
 	void OnRender();
 	void OnExit();
 
+	// Function to handle rendering a tile
+	void RenderTile(rt::DATA::tile *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag);
+
 private:
 	// For debugging
 	void PrintVector(const qbVector3<double> &inputVector) const;
@@ -33,6 +41,9 @@ private:
 
 	// Handle destroying the tile grid
 	bool DestroyTileGrid();
+
+	// Reset the tile flags
+	void ResetTileFlags();
 
 	// Convert tile image to texture
 	void ConvertImageToTexture(rt::DATA::tile &tile); // might be obsolete
@@ -52,8 +63,16 @@ private:
 
 	// Array to store tiles
 	std::vector <rt::DATA::tile> m_Tiles;
-	std::vector<int> m_tileFlags;
+	// Tile flags are now instances of std::atomic<int> as they will be accessed concurrently
+	std::vector<std::atomic<int> *> m_tileFlags;
 	int m_numTilesX, m_numTilesY;
+
+	// Thread stuff
+	int m_maxThreads = 6;
+	int m_numCurrentThreads = 0;
+	std::vector<int> m_tilesCurrentlyRendering;
+	std::vector<std::thread> m_Threads;
+	std::atomic<int> *m_threadCounter;
 
 	// Scene instance
 	rt::ReflectionScene m_Scene;
