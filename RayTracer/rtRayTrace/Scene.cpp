@@ -5,11 +5,26 @@ rt::Scene::Scene()
 {
 	// Create some materials
 	auto material = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
+	auto material2 = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
+	auto material3 = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
+	auto floorMaterial = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
 
 	// Set up the materials
 	material->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
-	material->reflectivity_ = 0.5;
+	material->reflectivity_ = 0.1;
 	material->shininess_ = 10.0;
+
+	material2->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.5, 0.0} };
+	material2->reflectivity_ = 0.75;
+	material2->shininess_ = 10.0;
+
+	material3->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
+	material3->reflectivity_ = 0.25;
+	material3->shininess_ = 10.0;
+
+	floorMaterial->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 1.0, 1.0} };
+	floorMaterial->reflectivity_ = 0.5;
+	floorMaterial->shininess_ = 0.0;
 
 	// Configure the camera 
 	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, -1.0}});
@@ -59,7 +74,10 @@ rt::Scene::Scene()
 	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
 
 	// Assign materials to objects
-	m_objectList.at(0)->AssignMaterial(material);
+	m_objectList.at(0)->AssignMaterial(material3);
+	m_objectList.at(1)->AssignMaterial(material);
+	m_objectList.at(2)->AssignMaterial(material2);
+	m_objectList.at(3)->AssignMaterial(floorMaterial);
 
 	// Make point lights
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
@@ -86,14 +104,16 @@ bool rt::Scene::Render(rtImage &outputImage)
 	qbVector<double> intPoint	{3};
 	qbVector<double> localNormal{3};
 	qbVector<double> localColor	{3};
-	// used to normalize the pixels from our typical dimensions (eg 1280 x 720) to range between [0, 1].
-	double xFactor = 1.0 / (static_cast<double>(width) / 2.0);	// [0, 2]
-	double yFactor = 1.0 / (static_cast<double>(height) / 2.0); // [0, 2]
+	// used to normalize the pixels from our typical dimensions (eg 1280 x 720) to range between [-1, 1].
+	double xFactor = 1.0 / (static_cast<double>(width) / 2.0);
+	double yFactor = 1.0 / (static_cast<double>(height) / 2.0);
 	double minDist = 1e6;
 	double maxDist = 0.0;
-	for (int x = 0; x < width; x++)
+	for (int y = 0; y < height; y++)
 	{
-		for (int y = 0; y < height; y++)
+		// Display progress
+		std::cout << "Processing line " << y << " of " << height << "." << std::endl;
+		for (int x = 0; x < width; x++)
 		{
 			// Normalize x and y coordinates
 			double normX = (static_cast<double>(x) * xFactor) - 1.0; // x * xFactor is in range [0, 2], so subtracting one yields range [-1, 1]
@@ -114,10 +134,11 @@ bool rt::Scene::Render(rtImage &outputImage)
 			if (intersectionFound)
 			{
 				// Check if object has a material
-				if (closestObject->m_hasMaterial)
+				if (closestObject->hasMaterial_)
 				{
 					// Use material to compute color
-					qbVector<double> color = closestObject->m_pMaterial->ComputeColor(m_objectList, m_lightList, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
+					rt::MaterialBase::reflectionRayCount_ = 0;
+					qbVector<double> color = closestObject->pMaterial_->ComputeColor(m_objectList, m_lightList, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
 
 					outputImage.SetPixel(x, y, color.GetElement(0), color.GetElement(1), color.GetElement(2));
 				}

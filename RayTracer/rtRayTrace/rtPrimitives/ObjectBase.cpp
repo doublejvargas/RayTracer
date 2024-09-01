@@ -31,8 +31,8 @@ bool rt::ObjectBase::CloseEnough(const double f1, const double f2)
 
 bool rt::ObjectBase::AssignMaterial(const std::shared_ptr<rt::MaterialBase> &objectMaterial)
 {
-	m_pMaterial = objectMaterial;
-	m_hasMaterial = true;
+	pMaterial_ = objectMaterial;
+	hasMaterial_ = true;
 
-	return m_hasMaterial;
+	return hasMaterial_;
 }

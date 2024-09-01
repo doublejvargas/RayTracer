@@ -45,9 +45,9 @@ namespace rt
 		rt::GTform transformMatrix_;
 
 		// A reference to the material assigned to this object
-		std::shared_ptr<rt::MaterialBase> m_pMaterial;
+		std::shared_ptr<rt::MaterialBase> pMaterial_;
 
 		// A flag to indicate whether this object has a material or not
-		bool m_hasMaterial = false;
+		bool hasMaterial_ = false;
 	};
 }

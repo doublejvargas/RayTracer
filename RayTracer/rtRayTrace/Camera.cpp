@@ -75,7 +75,7 @@ void rt::Camera::UpdateCameraGeometry()
 
 bool rt::Camera::GenerateRay(float proScreenX, float proScreenY, rt::Ray &cameraRay)
 { 
-	// Compute the location of the virtual projected screen point in world coordinates (ie, camera world coordinates)
+	// Compute the location of the virtual projected screen point in world space (ie, camera world coordinates)
 	qbVector<double> screenWorldX = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
 	qbVector<double> screenWorldCoordinate = screenWorldX + (m_projectionScreenV * proScreenY);
 

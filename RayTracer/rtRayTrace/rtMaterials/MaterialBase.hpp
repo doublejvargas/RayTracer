@@ -32,6 +32,14 @@ namespace rt
 														const qbVector<double> &baseColor
 												   );
 
+		// Compute the reflection color
+		qbVector<double> ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+													const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+													const std::shared_ptr<rt::ObjectBase> &currentObject,
+													const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+													const rt::Ray &incidentRay
+											   );
+
 		// Cast a ray into the scene
 		bool CastRay(	const rt::Ray &castRay, 
 						const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
@@ -43,7 +51,10 @@ namespace rt
 					);
 
 	public:
-		// Public member variables
+		// Counter for the number of reflection rays
+		// These are static variables because we want them to be initialized once, and for all MaterialBase objects to share this data.
+		inline static int maxReflectionRays_;
+		inline static int reflectionRayCount_;
 
 	private:
 	};
