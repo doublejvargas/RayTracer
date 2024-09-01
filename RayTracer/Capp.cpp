@@ -21,9 +21,6 @@ bool Capp::OnInit()
 	{
 		m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, 0);
 
-		// Initialize the rtImage instance
-		//m_Image.Initialize(1280, 720, m_pRenderer);
-
 		/* Instead of initializing the image, we now initialize the scene with
 		   the window dimensions and then generate a tile grid with tiles of the specified size */
 		m_Scene.width_ = m_Width;
@@ -39,13 +36,6 @@ bool Capp::OnInit()
 		// Set background to white
 		SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
 		SDL_RenderClear(m_pRenderer);
-
-		/* Following the introduction of tile-based rendering, we no longer need to render the image here */
-		// Render the scene
-		//m_Scene.Render(m_Image);
-
-		// Display the image
-		//m_Image.Display();
 
 		// Present the result
 		SDL_RenderPresent(m_pRenderer);
@@ -94,22 +84,20 @@ void Capp::OnEvent(SDL_Event *event)
 	}
 }
 
+/*
+	The actual rendering is now handled here, each time we come through
+	this loop. At the moment, before implementing multi-threading, we
+	proceed by looping through all of the tiles and finding the first
+	one that has not been rendered yet (as indicated by m_tileFlags).
+	We then call the RenderTile function from the scene base class and
+	pass a reference to the relevant tile as the only parameter. Finally,
+	we update m_tileFlags for this tile to indicate that it has now been
+	rendered and then break out of the loop. We don't want to end up
+	rendering every tile all at once, we want to one tile each time
+	we come through the OnLoop() function.
+*/
 void Capp::OnLoop()
-{
-	/*
-		The actual rendering is now handled here, each time we come through
-		this loop. At the moment, before implementing multi-threading, we
-		proceed by looping through all of the tiles and finding the first
-		one that has not been rendered yet (as indicated by m_tileFlags).
-		We then call the RenderTile function from the scene base class and
-		pass a reference to the relevant tile as the only parameter. Finally,
-		we update m_tileFlags for this tile to indicate that it has now been
-		rendered and then break out of the loop. We don't want to end up
-		rendering every tile all at once, we want to one tile each time
-		we come through the OnLoop() function.
-	*/
-
-	
+{	
 	// Loop through all tiles and find the first one that hasn't been rendered yet
 	for (int i = 0; i < m_Tiles.size(); i++)
 	{
@@ -148,8 +136,6 @@ void Capp::OnRender()
 		version.
 	*/
 
-	//
-
 	// Render the tiles
 	for (int i = 0; i < m_Tiles.size(); i++)
 	{
@@ -169,16 +155,12 @@ void Capp::OnRender()
 			* rendered, but not yet converted to a texture. So we do that here and ten set the textureComplete
 			* flag and blit the texture into the renderer. Note that once this is done, we don't do this again
 			* for this tile meaning that we don't keep updating each tile very time we go through this loop.
-			* This helps to keep things as efficient as possible.
-			*/ 
+			* This helps to keep things as efficient as possible. */ 
 
-			//
 			if (!m_Tiles.at(i).textureComplete)
 			{
 				ConvertImageToTexture(m_Tiles.at(i));
 				m_Tiles.at(i).textureComplete = true;
-				// might need to do something like this here since I haven't implemented textures
-				// SDL_UpdateTexture(m_pTexture, nullptr, tempPixels, m_Width * sizeof(uint32_t));
 				SDL_RenderCopy(m_pRenderer, m_Tiles.at(i).pTexture, &srcRect, &dstRect);
 			}
 		}
@@ -277,10 +259,10 @@ bool Capp::DestroyTileGrid()
 
 void Capp::ConvertImageToTexture(rt::DATA::tile &tile)
 {
-	// Alternative way to allocate buffer
+	// Allocate memory for a pixel buffer
 	uint32_t *tempPixels = (uint32_t *)calloc((size_t)m_Width * m_Height, sizeof(uint32_t));  // DON'T forget to free!
 
-	// Allocate memory for a pixel buffer
+	// Alternate way to allocate memory for a pixel buffer
 	//uint32_t *tempPixels = new uint32_t[tile.width * tile.height];
 
 	// Clear the pixel buffer
@@ -297,10 +279,11 @@ void Capp::ConvertImageToTexture(rt::DATA::tile &tile)
 	SDL_UpdateTexture(tile.pTexture, nullptr, tempPixels, tile.width * sizeof(uint32_t));
 
 	// Delete the pixel buffer
+	free(tempPixels);
+
+	// Alternate way to delete the pixel buffer
 	//delete[] tempPixels;
 
-	// Alternate way to delete
-	free(tempPixels);
 }
 
 uint32_t Capp::ConvertColor(const double red, const double green, const double blue)

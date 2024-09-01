@@ -22,10 +22,10 @@ namespace rt
 		// Destructor
 		virtual ~Scene();
 
-		// Function to perform rendering
+		// Function to perform rendering in normal rendering mode
 		bool Render(rtImage &outputImage);
 
-		// Function to render a tile
+		// Function to render a tile (used for tile-based rendering)
 		void RenderTile(rt::DATA::tile *tile);
 
 		// Function to cast a ray into the scene
@@ -38,7 +38,7 @@ namespace rt
 
 		virtual void SetupSceneObjects();
 
-		// Private methods
+	// Private methods
 	private:
 		// Render a pixel
 		qbVector3<double> RenderPixel(int x, int y, int width, int height);
@@ -47,7 +47,7 @@ namespace rt
 		int Sub2Ind(int x, int y, int width, int height);
 
 
-		// Private members
+	// Public members
 	public:
 		// The camera that the scene uses
 		rt::Camera camera_;
