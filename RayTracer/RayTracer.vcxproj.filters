@@ -110,5 +110,8 @@
     <ClInclude Include="rtRayTrace\rtMaterials\simplematerial.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="toolbox\qbVector2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

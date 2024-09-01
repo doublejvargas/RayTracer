@@ -4,7 +4,7 @@
 #include "rtRayTrace/rtPrimitives/ObjectBase.hpp"
 
 // tools
-#include "toolbox/qbVector.h"
+#include "toolbox/qbVector3.hpp"
 
 //lib
 #include <memory>
@@ -28,15 +28,15 @@ namespace rt
 		// intensity: computed intensity at intPoint.
 		//************************************
 		virtual bool ComputeIllumination
-		(	const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+		(	const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 			const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 			const std::shared_ptr<rt::ObjectBase> &currentObject,
-			qbVector<double> &color, double &intensity
+			qbVector3<double> &color, double &intensity
 		);
 
 	public:
-		qbVector<double> m_Color	{ 3 };	// Color of light source
-		qbVector<double> m_Location	{ 3 };  // Location of light source
+		qbVector3<double> m_Color	{ 3 };	// Color of light source
+		qbVector3<double> m_Location	{ 3 };  // Location of light source
 		double m_Intensity			{ 3 };	// Intensity [0, 1]
 		
 	};

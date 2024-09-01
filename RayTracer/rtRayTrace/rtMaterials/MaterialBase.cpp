@@ -11,30 +11,30 @@ rt::MaterialBase::~MaterialBase()
 
 }
 
-qbVector<double> rt::MaterialBase::ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+qbVector3<double> rt::MaterialBase::ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 													const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 													const std::shared_ptr<rt::ObjectBase> &currentObject,
-													const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+													const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 													const rt::Ray &cameraRay
 												)
 {
 	// Define an initial material color
-	qbVector<double> matColor	{ 3 };
+	qbVector3<double> matColor	{ 3 };
 
 	return matColor;
 }
 
-qbVector<double> rt::MaterialBase::ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+qbVector3<double> rt::MaterialBase::ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 														const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 														const std::shared_ptr<rt::ObjectBase> &currentObject,
-														const qbVector<double> &intPoint, const qbVector<double> &localNormal,
-														const qbVector<double> &baseColor
+														const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
+														const qbVector3<double> &baseColor
 													  )
 {
 	// Compute the color due to diffuse illumination
-	qbVector<double> diffuseColor	{ 3 };
+	qbVector3<double> diffuseColor	{ 3 };
 	double intensity;
-	qbVector<double> color	{ 3 };
+	qbVector3<double> color	{ 3 };
 	double red = 0.0;
 	double green = 0.0;
 	double blue = 0.0;
@@ -63,32 +63,32 @@ qbVector<double> rt::MaterialBase::ComputeDiffuseColor(	const std::vector<std::s
 	return diffuseColor;
 }
 
-qbVector<double> rt::MaterialBase::ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+qbVector3<double> rt::MaterialBase::ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 															const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 															const std::shared_ptr<rt::ObjectBase> &currentObject,
-															const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+															const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 															const rt::Ray &incidentRay
 														)
 {
-	qbVector<double> reflectionColor	{ 3 };
+	qbVector3<double> reflectionColor;
 
 	// Compute the reflection vector
-	qbVector<double> d = incidentRay.lab;
-	qbVector<double> reflectionVector = d - (2 * qbVector<double>::dot(d, localNormal) * localNormal);
+	qbVector3<double> d = incidentRay.lab;
+	qbVector3<double> reflectionVector = d - (2 * qbVector3<double>::dot(d, localNormal) * localNormal);
 
 	// Construct the reflection ray
 	rt::Ray reflectionRay{ intPoint, intPoint + reflectionVector };
 
 	/* Cast this ray into the scene and find the closest object that it intersects with */
 	std::shared_ptr<rt::ObjectBase> closestObject;
-	qbVector<double> closestIntPoint	{ 3 };
-	qbVector<double> closestLocalNormal	{ 3 };
-	qbVector<double> closestLocalColor	{ 3 };
+	qbVector3<double> closestIntPoint;
+	qbVector3<double> closestLocalNormal;
+	qbVector3<double> closestLocalColor;
 	bool intersectionFound = CastRay(	reflectionRay, objectList, currentObject,
 										closestObject, closestIntPoint, closestLocalNormal, closestLocalColor
 									);
 	/* Compute illumination for closest object assuming that there was a valid intersection */
-	qbVector<double> matColor	{ 3 };
+	qbVector3<double> matColor;
 	if ((intersectionFound) and (reflectionRayCount_ < maxReflectionRays_))
 	{
 		// Increment the reflectionRayCount in order to avoid infinite recursion
@@ -120,15 +120,15 @@ bool rt::MaterialBase::CastRay(	const rt::Ray &castRay,
 								const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 								const std::shared_ptr<rt::ObjectBase> &thisObject,
 								std::shared_ptr<rt::ObjectBase> &closestObject,
-								qbVector<double> &closestIntPoint,
-								qbVector<double> &closestLocalNormal,
-								qbVector<double> &closestLocalColor
+								qbVector3<double> &closestIntPoint,
+								qbVector3<double> &closestLocalNormal,
+								qbVector3<double> &closestLocalColor
 							  )
 {
 	// Test for intersections with all of the objects in the scene
-	qbVector<double> intPoint		{ 3 };
-	qbVector<double> localNormal	{ 3 };
-	qbVector<double> localColor		{ 3 };
+	qbVector3<double> intPoint;
+	qbVector3<double> localNormal;
+	qbVector3<double> localColor;
 
 	double minDist = 1e6;
 	bool intersectionFound = false;

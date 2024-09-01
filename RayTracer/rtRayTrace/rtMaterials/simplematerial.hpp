@@ -13,21 +13,21 @@ namespace rt
 		virtual ~SimpleMaterial() override;
 
 		// Return the color of the material
-		virtual qbVector<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+		virtual qbVector3<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 												const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 												const std::shared_ptr<rt::ObjectBase> &currentObject,
-												const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+												const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 												const rt::Ray &cameraRay
 											  ) override;
 
 		// Compute specular highlights
-		qbVector<double> ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+		qbVector3<double> ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 											const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-											const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+											const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 											const rt::Ray &cameraRay
 										);
 	public:
-		qbVector<double> baseColor_{ std::vector<double>{1.0, 0.0, 1.0} };
+		qbVector3<double> baseColor_{ std::vector<double>{1.0, 0.0, 1.0} };
 		double reflectivity_ = 0.0;
 		double shininess_ = 0.0;
 

@@ -11,21 +11,21 @@ rt::ObjPlane::~ObjPlane()
 }
 
 bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
-										qbVector<double> &intPoint,
-										qbVector<double> &localNormal,
-										qbVector<double> &localColor)
+										qbVector3<double> &intPoint,
+										qbVector3<double> &localNormal,
+										qbVector3<double> &localColor)
 {
 	// Copy the ray and apply the backwards transform
 	// this is the ^l in ^l = ^a + ^kt
 	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Copy the m_lab vector from bckRay and normalize it
-	qbVector<double> k = bckRay.lab;
+	qbVector3<double> k = bckRay.lab;
 	k.Normalize(); // unit vector ^k from the line equation above
 
 	/* Check if there is an intersection, ie. if the castRay is not parallel to the plane
 		NOTE: kz being = 0 means parallel because the plane is the XY plane (where Z is 0 always),
-		so, any vector that is parallel to this plane, will have a Z-component of 0, ie, element at index 2 of a qbVector{3} will be zero */
+		so, any vector that is parallel to this plane, will have a Z-component of 0, ie, element at index 2 of a qbVector3 will be zero */
 	if (!CloseEnough(k.GetElement(2), 0.0))
 	{
 		// If above condition true: there is an intersection because vector is not parallel to plane
@@ -82,18 +82,18 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 			{
 				// Compute the point of intersection
 				// poi = ^a + ^kt (remember, general equation for a line, and we have computed t!)
-				qbVector<double> poi = bckRay.p1 + (t * k);
+				qbVector3<double> poi = bckRay.p1 + (t * k);
 
 				// Transform the intersection point back into world coordinates
 				intPoint = transformMatrix_.Apply(poi, rt::FWDTFORM);
 
 				// Compute the local normal (shouldn't this be global (world space) normal?)
 				// origin in local object space
-				qbVector<double> localOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
+				qbVector3<double> localOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
 				// normal to XY plane in local object space, vector with Z component (why negative?, perhaps because it is pointing toward camera pinhole!)
-				qbVector<double> normalVector{ std::vector<double>{0.0, 0.0, -1.0} };
+				qbVector3<double> normalVector{ std::vector<double>{0.0, 0.0, -1.0} };
 				// Origin transformed to world space
-				qbVector<double> globalOrigin = transformMatrix_.Apply(localOrigin, rt::FWDTFORM);
+				qbVector3<double> globalOrigin = transformMatrix_.Apply(localOrigin, rt::FWDTFORM);
 				// Transform local normal (global?) to world space and get origin pointing toward normal
 				localNormal = transformMatrix_.Apply(normalVector, rt::FWDTFORM) - globalOrigin;
 				localNormal.Normalize(); // unit vector

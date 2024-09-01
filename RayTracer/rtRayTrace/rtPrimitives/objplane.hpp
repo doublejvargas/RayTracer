@@ -16,9 +16,9 @@ namespace rt
 
 		// Override the function to test intersections
 		virtual bool TestIntersection(	const Ray &castRay, 
-										qbVector<double> &intPoint, 
-										qbVector<double> &localNormal, 
-										qbVector<double> &localColor) override;
+										qbVector3<double> &intPoint, 
+										qbVector3<double> &localNormal, 
+										qbVector3<double> &localColor) override;
 	private:
 
 	};

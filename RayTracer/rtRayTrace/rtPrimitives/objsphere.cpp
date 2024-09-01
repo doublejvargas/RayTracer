@@ -44,14 +44,14 @@ rt::ObjSphere::~ObjSphere()
 * 
 *	Note: since a = (v̂·v̂), which is the dot product of two unit vectors, it is always equal to 1.0.
 */
-bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPoint, qbVector<double> &localNormal, qbVector<double> &localColor)
+bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector3<double> &intPoint, qbVector3<double> &localNormal, qbVector3<double> &localColor)
 {
 	// Transform castRay into coordinate system of the sphere.
 	// For this, we use backwards transform to transform from current ray's world coordinates to local coordinates.
 	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Compute the values of a, b and c
-	qbVector<double> vHat = bckRay.lab;
+	qbVector3<double> vHat = bckRay.lab;
 	vHat.Normalize();
 
 	/* Note that 'a' is equal to the squared magnitude of the direction of the cast ray. As this will be a unit vector,
@@ -59,15 +59,15 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 	*/
 	// double a = 1.0;
 
-	double b = 2.0 * qbVector<double>::dot(bckRay.p1, vHat);
+	double b = 2.0 * qbVector3<double>::dot(bckRay.p1, vHat);
 
-	double c = qbVector<double>::dot(bckRay.p1, bckRay.p1) - 1.0;
+	double c = qbVector3<double>::dot(bckRay.p1, bckRay.p1) - 1.0;
 
 	// Test whether we actually have an intersection
 	double discriminant_squared = (b * b) - 4.0 * c;
 
 	// point of intersection in the LOCAL coordinate system of the sphere
-	qbVector<double> poi; 
+	qbVector3<double> poi; 
 	if (discriminant_squared > 0.0)
 	{
 		double discriminant = sqrt(discriminant_squared);
@@ -99,8 +99,8 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector<double> &intPo
 			// Compute the local normal
 			// Because we have a sphere located at the origin, the normal vector is
 			//  simply a vector from the origin to the point of intersection, i.e., the intersection point.
-			qbVector<double> objOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
-			qbVector<double> newObjOrigin = transformMatrix_.Apply(objOrigin, rt::FWDTFORM);
+			qbVector3<double> objOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
+			qbVector3<double> newObjOrigin = transformMatrix_.Apply(objOrigin, rt::FWDTFORM);
 			localNormal = intPoint - newObjOrigin;
 			localNormal.Normalize();
 

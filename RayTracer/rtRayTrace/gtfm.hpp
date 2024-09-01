@@ -23,9 +23,9 @@ namespace rt
 
 		// Set translation, rotation and scale components
 		void SetTransform(
-			const qbVector<double> &translation,
-			const qbVector<double> &rotation,
-			const qbVector<double> &scale
+			const qbVector3<double> &translation,
+			const qbVector3<double> &rotation,
+			const qbVector3<double> &scale
 		);
 
 		// Getters
@@ -34,7 +34,7 @@ namespace rt
 
 		// Overloaded "apply" function to apply the transformation
 		rt::Ray Apply(const rt::Ray &inputRay, bool dirFlag);
-		qbVector<double> Apply(const qbVector<double> &inputVector, bool dirFlag);
+		qbVector3<double> Apply(const qbVector3<double> &inputVector, bool dirFlag);
 
 		// Overloaded operators
 		friend GTform operator*(const rt::GTform &lhs, const rt::GTform &rhs);
@@ -43,7 +43,7 @@ namespace rt
 		// Print transform matrix to STDOUT
 		void PrintMatrix(bool dirFlag);
 		// Print vectors
-		static void PrintVector(const qbVector<double> &vector);
+		static void PrintVector(const qbVector3<double> &vector);
 
 	// PRIVATE METHODS
 	private:

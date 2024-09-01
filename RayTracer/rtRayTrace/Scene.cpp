@@ -1,6 +1,9 @@
 #include "Scene.hpp"
 #include "rtMaterials/simplematerial.hpp"
 
+// lib
+#include <chrono>
+
 rt::Scene::Scene()
 {
 	// Create some materials
@@ -10,26 +13,26 @@ rt::Scene::Scene()
 	auto floorMaterial = std::make_shared<rt::SimpleMaterial>(rt::SimpleMaterial());
 
 	// Set up the materials
-	material->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
+	material->baseColor_ = qbVector3<double>{ std::vector<double>{0.25, 0.5, 0.8} };
 	material->reflectivity_ = 0.1;
 	material->shininess_ = 10.0;
 
-	material2->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.5, 0.0} };
+	material2->baseColor_ = qbVector3<double>{ std::vector<double>{1.0, 0.5, 0.0} };
 	material2->reflectivity_ = 0.75;
 	material2->shininess_ = 10.0;
 
-	material3->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
+	material3->baseColor_ = qbVector3<double>{ std::vector<double>{1.0, 0.8, 0.0} };
 	material3->reflectivity_ = 0.25;
 	material3->shininess_ = 10.0;
 
-	floorMaterial->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 1.0, 1.0} };
+	floorMaterial->baseColor_ = qbVector3<double>{ std::vector<double>{1.0, 1.0, 1.0} };
 	floorMaterial->reflectivity_ = 0.5;
 	floorMaterial->shininess_ = 0.0;
 
 	// Configure the camera 
-	m_Camera.SetPosition(qbVector<double>{std::vector<double>{0.0, -10.0, -1.0}});
-	m_Camera.SetLookAt	(qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}});
-	m_Camera.SetUpVector(qbVector<double>{std::vector<double>{0.0, 0.0, 1.0}});
+	m_Camera.SetPosition(qbVector3<double>{std::vector<double>{0.0, -10.0, -1.0}});
+	m_Camera.SetLookAt	(qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}});
+	m_Camera.SetUpVector(qbVector3<double>{std::vector<double>{0.0, 0.0, 1.0}});
 	m_Camera.SetProjScreenWidth(0.25);
 	m_Camera.SetAspect(16.0 / 9.0);
 	m_Camera.UpdateCameraGeometry();
@@ -41,37 +44,37 @@ rt::Scene::Scene()
 
 	// make a plane
 	m_objectList.push_back(std::make_shared<rt::ObjPlane>(rt::ObjPlane{}));
-	m_objectList.at(3)->baseColor_ = qbVector<double>{ std::vector<double>{0.5, 0.5, 0.5} };
+	m_objectList.at(3)->baseColor_ = qbVector3<double>{ std::vector<double>{0.5, 0.5, 0.5} };
 
 	rt::GTform planeTransform;
-	planeTransform.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.75}},
-									qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-									qbVector<double>{std::vector<double>{4.0, 4.0, 1.0}});
+	planeTransform.SetTransform(	qbVector3<double>{std::vector<double>{0.0, 0.0, 0.75}},
+									qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}},
+									qbVector3<double>{std::vector<double>{4.0, 4.0, 1.0}});
 	m_objectList.at(3)->SetTransformMatrix(planeTransform);
 
 	// Modify the spheres
 	// Set transformations
 	rt::GTform matrix1, matrix2, matrix3;
-	matrix1.SetTransform(	qbVector<double>{std::vector<double>{-1.5, 0.0, 0.0}}, // translation
-							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},  // rotation
-							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}}); // scaling
+	matrix1.SetTransform(	qbVector3<double>{std::vector<double>{-1.5, 0.0, 0.0}}, // translation
+							qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}},  // rotation
+							qbVector3<double>{std::vector<double>{0.5, 0.5, 0.5}}); // scaling
 
-	matrix2.SetTransform(	qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}});
+	matrix2.SetTransform(	qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector3<double>{std::vector<double>{0.5, 0.5, 0.5}});
 
-	matrix3.SetTransform(	qbVector<double>{std::vector<double>{1.5, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.0, 0.0, 0.0}},
-							qbVector<double>{std::vector<double>{0.5, 0.5, 0.5}});
+	matrix3.SetTransform(	qbVector3<double>{std::vector<double>{1.5, 0.0, 0.0}},
+							qbVector3<double>{std::vector<double>{0.0, 0.0, 0.0}},
+							qbVector3<double>{std::vector<double>{0.5, 0.5, 0.5}});
 
  	m_objectList.at(0)->SetTransformMatrix(matrix1);
  	m_objectList.at(1)->SetTransformMatrix(matrix2);
  	m_objectList.at(2)->SetTransformMatrix(matrix3);
 	
 	// Set spheres base color 
-	m_objectList.at(0)->baseColor_ = qbVector<double>{ std::vector<double>{0.25, 0.5, 0.8} };
-	m_objectList.at(1)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.5, 0.0} };
-	m_objectList.at(2)->baseColor_ = qbVector<double>{ std::vector<double>{1.0, 0.8, 0.0} };
+	m_objectList.at(0)->baseColor_ = qbVector3<double>{ std::vector<double>{0.25, 0.5, 0.8} };
+	m_objectList.at(1)->baseColor_ = qbVector3<double>{ std::vector<double>{1.0, 0.5, 0.0} };
+	m_objectList.at(2)->baseColor_ = qbVector3<double>{ std::vector<double>{1.0, 0.8, 0.0} };
 
 	// Assign materials to objects
 	m_objectList.at(0)->AssignMaterial(material3);
@@ -81,29 +84,32 @@ rt::Scene::Scene()
 
 	// Make point lights
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
-	m_lightList.at(0)->m_Location = qbVector<double>{ std::vector<double>{5.0, -10.0, -5.0} }; // -z value because currently the z axis is inverted in our application.
-	m_lightList.at(0)->m_Color = qbVector<double>{ std::vector<double>{0.0, 0.0, 1.0} };
+	m_lightList.at(0)->m_Location = qbVector3<double>{ std::vector<double>{5.0, -10.0, -5.0} }; // -z value because currently the z axis is inverted in our application.
+	m_lightList.at(0)->m_Color = qbVector3<double>{ std::vector<double>{0.0, 0.0, 1.0} };
 
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
-	m_lightList.at(1)->m_Location = qbVector<double>{ std::vector<double>{-5.0, -10.0, -5.0} };
-	m_lightList.at(1)->m_Color = qbVector<double>{ std::vector<double>{1.0, 0.0, 0.0} };
+	m_lightList.at(1)->m_Location = qbVector3<double>{ std::vector<double>{-5.0, -10.0, -5.0} };
+	m_lightList.at(1)->m_Color = qbVector3<double>{ std::vector<double>{1.0, 0.0, 0.0} };
 	
 	m_lightList.push_back(std::make_shared<rt::PointLight>(rt::PointLight()));
-	m_lightList.at(2)->m_Location = qbVector<double>{ std::vector<double>{0.0, -10.0, -5.0} };
-	m_lightList.at(2)->m_Color = qbVector<double>{ std::vector<double>{0.0, 1.0, 0.0} };
+	m_lightList.at(2)->m_Location = qbVector3<double>{ std::vector<double>{0.0, -10.0, -5.0} };
+	m_lightList.at(2)->m_Color = qbVector3<double>{ std::vector<double>{0.0, 1.0, 0.0} };
 }
 
 bool rt::Scene::Render(rtImage &outputImage)
 {
+	// Record the start time
+	auto startTime = std::chrono::steady_clock::now();
+
 	// Get the dimensions of the output image
 	int width = outputImage.GetWidth();
 	int height = outputImage.GetHeight();
 
 	// Loop over each pixel in our image
 	rt::Ray cameraRay;
-	qbVector<double> intPoint	{3};
-	qbVector<double> localNormal{3};
-	qbVector<double> localColor	{3};
+	qbVector3<double> intPoint;
+	qbVector3<double> localNormal;
+	qbVector3<double> localColor;
 	// used to normalize the pixels from our typical dimensions (eg 1280 x 720) to range between [-1, 1].
 	double xFactor = 1.0 / (static_cast<double>(width) / 2.0);
 	double yFactor = 1.0 / (static_cast<double>(height) / 2.0);
@@ -112,7 +118,9 @@ bool rt::Scene::Render(rtImage &outputImage)
 	for (int y = 0; y < height; y++)
 	{
 		// Display progress
-		std::cout << "Processing line " << y << " of " << height << "." << std::endl;
+		std::cout << "Processing line " << y << " of " << height << "." << "\r";
+		std::cout.flush();
+
 		for (int x = 0; x < width; x++)
 		{
 			// Normalize x and y coordinates
@@ -124,9 +132,9 @@ bool rt::Scene::Render(rtImage &outputImage)
 
 			// Test for intersections with all objects in the scene
 			std::shared_ptr<rt::ObjectBase> closestObject;
-			qbVector<double> closestIntPoint	{ 3 };
-			qbVector<double> closestLocalNormal	{ 3 };
-			qbVector<double> closestLocalColor	{ 3 };
+			qbVector3<double> closestIntPoint	{ 3 };
+			qbVector3<double> closestLocalNormal	{ 3 };
+			qbVector3<double> closestLocalColor	{ 3 };
 			bool intersectionFound = CastRay(cameraRay, closestObject, closestIntPoint, closestLocalNormal, closestLocalColor);
 			
 			/* Compute the illumination for the closest object, assuming that there
@@ -138,14 +146,14 @@ bool rt::Scene::Render(rtImage &outputImage)
 				{
 					// Use material to compute color
 					rt::MaterialBase::reflectionRayCount_ = 0;
-					qbVector<double> color = closestObject->pMaterial_->ComputeColor(m_objectList, m_lightList, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
+					qbVector3<double> color = closestObject->pMaterial_->ComputeColor(m_objectList, m_lightList, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
 
 					outputImage.SetPixel(x, y, color.GetElement(0), color.GetElement(1), color.GetElement(2));
 				}
 				else
 				{
 					// Use basic method to compute color
-					qbVector<double> matColor = rt::MaterialBase::ComputeDiffuseColor(	m_objectList, m_lightList,
+					qbVector3<double> matColor = rt::MaterialBase::ComputeDiffuseColor(	m_objectList, m_lightList,
 																						closestObject, closestIntPoint, 
 																						closestLocalNormal, closestObject->baseColor_
 																					 );
@@ -155,20 +163,27 @@ bool rt::Scene::Render(rtImage &outputImage)
 			}
 		}
 	}
+	// Record the end time
+	auto endTime = std::chrono::steady_clock::now();
+
+	// Compute the time it took to render
+	std::chrono::duration<double> renderTime = endTime - startTime;
+	std::cout.flush();
+	std::cout << "\n\nRendering time: " << renderTime.count() << "s" << std::endl;
 
 	return true;
 }
 
 bool rt::Scene::CastRay(	rt::Ray &castRay, 
 							std::shared_ptr<rt::ObjectBase> &closestObject,
-							qbVector<double> &closestIntPoint,
-							qbVector<double> &closestLocalNormal, 
-							qbVector<double> &closestLocalColor
+							qbVector3<double> &closestIntPoint,
+							qbVector3<double> &closestLocalNormal, 
+							qbVector3<double> &closestLocalColor
 						)
 {
-	qbVector<double> intPoint	{ 3 };
-	qbVector<double> localNormal{ 3 };
-	qbVector<double> localColor	{ 3 };
+	qbVector3<double> intPoint;
+	qbVector3<double> localNormal;
+	qbVector3<double> localColor;
 	double minDist = 1e6;
 	bool intersectionFound = false;
 	for (auto currentObject : m_objectList)

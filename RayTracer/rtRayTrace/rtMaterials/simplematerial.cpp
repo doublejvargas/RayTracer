@@ -10,18 +10,18 @@ rt::SimpleMaterial::~SimpleMaterial()
 
 }
 
-qbVector<double> rt::SimpleMaterial::ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+qbVector3<double> rt::SimpleMaterial::ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 													const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 													const std::shared_ptr<rt::ObjectBase> &currentObject,
-													const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+													const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 													const rt::Ray &cameraRay
 												 )
 {
 	// Define the initial material colors
-	qbVector<double> matColor	{3};
-	qbVector<double> refColor	{3};
-	qbVector<double> difColor	{3};
-	qbVector<double> spcColor	{3};
+	qbVector3<double> matColor;
+	qbVector3<double> refColor;
+	qbVector3<double> difColor;
+	qbVector3<double> spcColor;
 
 	// Compute the diffuse component
 	difColor = ComputeDiffuseColor(objectList, lightList, currentObject, intPoint, localNormal, baseColor_);
@@ -43,13 +43,13 @@ qbVector<double> rt::SimpleMaterial::ComputeColor(	const std::vector<std::shared
 	return matColor;
 }
 
-qbVector<double> rt::SimpleMaterial::ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+qbVector3<double> rt::SimpleMaterial::ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 														const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-														const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+														const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 														const rt::Ray &cameraRay
 													)
 {
-	qbVector<double> spcColor	{ 3 };
+	qbVector3<double> spcColor;
 	double red = 0.0;
 	double green = 0.0;
 	double blue = 0.0;
@@ -62,17 +62,17 @@ qbVector<double> rt::SimpleMaterial::ComputeSpecular(	const std::vector<std::sha
 		
 		double intensity = 0.0;
 		// Construct a unit vector pointing from the intersection point to the light
-		qbVector<double> toLightDir{ (currentLight->m_Location - intPoint).Normalized() };
+		qbVector3<double> toLightDir{ (currentLight->m_Location - intPoint).Normalized() };
 		// Compute a start point
-		qbVector<double> startPoint{ intPoint + (toLightDir * .001) };
+		qbVector3<double> startPoint{ intPoint + (toLightDir * .001) };
 		// Construct a ray from the point of intersection to the light
 		rt::Ray toLightRay{ startPoint, startPoint + toLightDir };
 
 		/* Loop through all objects in the scene to check if
 		   any obstruct light from this source */
-		qbVector<double> poi		{ 3 };
-		qbVector<double> poiNormal	{ 3 };
-		qbVector<double> poiColor	{ 3 };
+		qbVector3<double> poi;
+		qbVector3<double> poiNormal;
+		qbVector3<double> poiColor;
 		bool validInt = false;
 		for (auto sceneObject : objectList)
 		{
@@ -98,15 +98,15 @@ qbVector<double> rt::SimpleMaterial::ComputeSpecular(	const std::vector<std::sha
 			*/
 
 			// Compute the reflection vector
-			qbVector<double> d = toLightRay.lab;
+			qbVector3<double> d = toLightRay.lab;
 				// ^r = ^l - 2(^l·^n)*^n 
-			qbVector<double> r = d - (2 * qbVector<double>::dot(d, localNormal) * localNormal);
+			qbVector3<double> r = d - (2 * qbVector3<double>::dot(d, localNormal) * localNormal);
 			r.Normalize();
 
 			// Compute the dot product
-			qbVector<double> v = cameraRay.lab;
+			qbVector3<double> v = cameraRay.lab;
 			v.Normalize();
-			double dotProduct = qbVector<double>::dot(r, v);
+			double dotProduct = qbVector3<double>::dot(r, v);
 
 			// Only proceed if the dot product is positive
 			if (dotProduct > 0.0)

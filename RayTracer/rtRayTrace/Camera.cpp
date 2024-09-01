@@ -2,25 +2,25 @@
 
 rt::Camera::Camera()
 {
-	m_cameraPosition = qbVector<double>{ std::vector<double>{0.0, -10.0, 0.0} };
-	m_cameraLookAt = qbVector<double>{ std::vector<double>{0.0, 0.0, 0.0} };
-	m_cameraUp = qbVector<double>{ std::vector<double>{0.0, 0.0, 1.0} };
+	m_cameraPosition = qbVector3<double>{ std::vector<double>{0.0, -10.0, 0.0} };
+	m_cameraLookAt = qbVector3<double>{ std::vector<double>{0.0, 0.0, 0.0} };
+	m_cameraUp = qbVector3<double>{ std::vector<double>{0.0, 0.0, 1.0} };
 	m_toScreenLenght = 1.0;
 	m_screenWidth = 1.0;
 	m_cameraAspectRatio = 1.0;
 }
 
-void rt::Camera::SetPosition(const qbVector<double> &newPos)
+void rt::Camera::SetPosition(const qbVector3<double> &newPos)
 {
 	m_cameraPosition = newPos;
 }
 
-void rt::Camera::SetLookAt(const qbVector<double> &newLookAt)
+void rt::Camera::SetLookAt(const qbVector3<double> &newLookAt)
 {
 	m_cameraLookAt = newLookAt;
 }
 
-void rt::Camera::SetUpVector(const qbVector<double> &upVector)
+void rt::Camera::SetUpVector(const qbVector3<double> &upVector)
 {
 	m_cameraUp = upVector;
 }
@@ -55,14 +55,14 @@ void rt::Camera::UpdateCameraGeometry()
 	*	and the vector from camera to "lookAt" position (alignmentVector). Therefore, to compute basis U vector in camera space,
 	*   we compute the cross product of the alignment vector and the camera space's up vector.
 	*/
-	m_projectionScreenU = qbVector<double>::cross(m_alignmentVector, m_cameraUp);
+	m_projectionScreenU = qbVector3<double>::cross(m_alignmentVector, m_cameraUp);
 	m_projectionScreenU.Normalize();
 
 	/* The V basis vector in the projected screen is perpendicular to the plane defined by U vector in camera space
 	*	and the vector from camera to "lookAt" position (alignmentVector). Therefore, to compute basis V vector in camera space, 
 	*   we compute the cross product of the U basis vector and the alignment vector.s
 	*/
-	m_projectionScreenV = qbVector<double>::cross(m_projectionScreenU, m_alignmentVector);
+	m_projectionScreenV = qbVector3<double>::cross(m_projectionScreenU, m_alignmentVector);
 	m_projectionScreenV.Normalize();
 
 	// Thirdly, compute the position of the center point of the virtual projected screen
@@ -76,8 +76,8 @@ void rt::Camera::UpdateCameraGeometry()
 bool rt::Camera::GenerateRay(float proScreenX, float proScreenY, rt::Ray &cameraRay)
 { 
 	// Compute the location of the virtual projected screen point in world space (ie, camera world coordinates)
-	qbVector<double> screenWorldX = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
-	qbVector<double> screenWorldCoordinate = screenWorldX + (m_projectionScreenV * proScreenY);
+	qbVector3<double> screenWorldX = m_projectionScreenCenter + (m_projectionScreenU * proScreenX);
+	qbVector3<double> screenWorldCoordinate = screenWorldX + (m_projectionScreenV * proScreenY);
 
 	// Use this point along with camera position to compute the ray and store to parameter cameraRay
 	cameraRay.p1 = m_cameraPosition;

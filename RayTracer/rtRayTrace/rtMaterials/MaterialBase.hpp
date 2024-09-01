@@ -2,7 +2,7 @@
 
 #include "rtPrimitives/ObjectBase.hpp"
 #include "rtLights/LightBase.hpp"
-#include "toolbox/qbVector.h"
+#include "toolbox/qbVector3.hpp"
 #include "Ray.hpp"
 
 // lib
@@ -17,26 +17,26 @@ namespace rt
 		virtual ~MaterialBase();
 
 		// Return the color of the material
-		virtual qbVector<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+		virtual qbVector3<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 												const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 												const std::shared_ptr<rt::ObjectBase> &currentObject,
-												const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+												const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 												const rt::Ray &cameraRay
 											 );
 
 		// Compute diffuse color
-		static qbVector<double> ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+		static qbVector3<double> ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 														const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 														const std::shared_ptr<rt::ObjectBase> &currentObject,
-														const qbVector<double> &intPoint, const qbVector<double> &localNormal,
-														const qbVector<double> &baseColor
+														const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
+														const qbVector3<double> &baseColor
 												   );
 
 		// Compute the reflection color
-		qbVector<double> ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+		qbVector3<double> ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 													const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
 													const std::shared_ptr<rt::ObjectBase> &currentObject,
-													const qbVector<double> &intPoint, const qbVector<double> &localNormal,
+													const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
 													const rt::Ray &incidentRay
 											   );
 
@@ -45,9 +45,9 @@ namespace rt
 						const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 						const std::shared_ptr<rt::ObjectBase> &thisObject,
 						std::shared_ptr<rt::ObjectBase> &closestObject,
-						qbVector<double> &closestIntPoint,
-						qbVector<double> &closestLocalNormal,
-						qbVector<double> &closestLocalColor
+						qbVector3<double> &closestIntPoint,
+						qbVector3<double> &closestLocalNormal,
+						qbVector3<double> &closestLocalColor
 					);
 
 	public:

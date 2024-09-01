@@ -24,9 +24,9 @@ namespace rt
 		// Function to cast a ray into the scene
 		bool CastRay(	rt::Ray &castRay,
 						std::shared_ptr<rt::ObjectBase> &closestObject,
-						qbVector<double> &closestIntPoint,
-						qbVector<double> &closestLocalNormal,
-						qbVector<double> &closestLocalColor 
+						qbVector3<double> &closestIntPoint,
+						qbVector3<double> &closestLocalNormal,
+						qbVector3<double> &closestLocalColor 
 					);
 	
 	// Private methods

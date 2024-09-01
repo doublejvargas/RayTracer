@@ -23,9 +23,10 @@ namespace rt
 		virtual ~ObjectBase();
 
 		// Function to test for intersections
-		virtual bool TestIntersection(	const Ray &castRay, qbVector<double> &intPoint, 
-										qbVector<double> &localNormal, 
-										qbVector<double> &localColor);
+		virtual bool TestIntersection(	const Ray &castRay,
+										qbVector3<double> &intPoint, 
+										qbVector3<double> &localNormal, 
+										qbVector3<double> &localColor);
 
 		// Set the transform matrix
 		void SetTransformMatrix(const rt::GTform &transformMatrix);
@@ -39,7 +40,7 @@ namespace rt
 	// Public member variables
 	public:
 		// Base color of the object
-		qbVector<double> baseColor_{ 3 };
+		qbVector3<double> baseColor_;
 
 		// Geometric transform applied to the object
 		rt::GTform transformMatrix_;
