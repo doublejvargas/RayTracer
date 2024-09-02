@@ -7,7 +7,8 @@
 #include "rtUtils.hpp"
 
 // tools
-#include "toolbox/qbVector3.hpp"
+//#include "toolbox/qbVector3.hpp"
+#include "toolbox/glm/glm.hpp"
 
 // lib
 #include <thread>
@@ -31,7 +32,7 @@ public:
 
 private:
 	// For debugging
-	void PrintVector(const qbVector3<double> &inputVector) const;
+	void PrintVector(const glm::dvec3 &inputVector) const;
 
 	/* New functions to handle tile-based rendering. This isn't much use 
 	*  right now, but forms the basis for the multi-threading implementation that we will look at later */

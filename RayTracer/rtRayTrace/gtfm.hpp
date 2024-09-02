@@ -3,7 +3,9 @@
 #include "Ray.hpp"
 
 // tools
-#include "toolbox/qbMatrix.h" // includes qbVector.h
+//#include "toolbox/qbMatrix.h" // includes qbVector.h
+#include "toolbox/glm/glm.hpp"
+#include "toolbox/glm/ext.hpp"
 
 namespace rt
 {
@@ -19,22 +21,22 @@ namespace rt
 
 		// Parametrized constructors
 		// Construct from a pair of matrices
-		GTform(const qbMatrix2<double> &fwd, const qbMatrix2<double> &bck);
+		GTform(const glm::dmat4 &fwd, const glm::dmat4 &bck);
 
 		// Set translation, rotation and scale components
 		void SetTransform(
-			const qbVector3<double> &translation,
-			const qbVector3<double> &rotation,
-			const qbVector3<double> &scale
+			const glm::dvec3 &translation,
+			const glm::dvec3 &rotation,
+			const glm::dvec3 &scale
 		);
 
 		// Getters
-		inline qbMatrix2<double> GetForward() const	 { return m_Fwdtfm; }
-		inline qbMatrix2<double> GetBackward() const { return m_Bcktfm; }
+		inline glm::dmat4 GetForward() const  { return m_Fwdtfm; }
+		inline glm::dmat4 GetBackward() const { return m_Bcktfm; }
 
 		// Overloaded "apply" function to apply the transformation
 		rt::Ray Apply(const rt::Ray &inputRay, bool dirFlag);
-		qbVector3<double> Apply(const qbVector3<double> &inputVector, bool dirFlag);
+		glm::dvec3 Apply(const glm::dvec3 &inputVector, bool dirFlag);
 
 		// Overloaded operators
 		friend GTform operator*(const rt::GTform &lhs, const rt::GTform &rhs);
@@ -43,15 +45,16 @@ namespace rt
 		// Print transform matrix to STDOUT
 		void PrintMatrix(bool dirFlag);
 		// Print vectors
-		static void PrintVector(const qbVector3<double> &vector);
+		static void PrintVector(const glm::dvec3 &vector);
 
 	// PRIVATE METHODS
 	private:
-		void Print(const qbMatrix2<double> &matrix);
+		void Print(const glm::dmat4 &matrix);
 
 	// PRIVATE MEMBERS
 	private:
-		qbMatrix2<double> m_Fwdtfm{ 4, 4 };
-		qbMatrix2<double> m_Bcktfm{ 4, 4 };
+		// Forward and backward transforms
+		glm::dmat4 m_Fwdtfm;
+		glm::dmat4 m_Bcktfm;
 	};
 }

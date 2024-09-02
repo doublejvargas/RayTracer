@@ -1,10 +1,13 @@
 ﻿#include "gtfm.hpp"
 
+// lib
+#include <iostream>
+#include <iomanip>
+
 rt::GTform::GTform()
+	: m_Fwdtfm{ glm::dmat4(1.0) }, m_Bcktfm{ glm::dmat4(1.0) }
 {
-	// Set forward and backward transforms to identity matrices
-	m_Fwdtfm.SetToIdentity();
-	m_Bcktfm.SetToIdentity();
+	// Set forward and backward transforms to identity matrices (done in initializer list above)
 }
 
 rt::GTform::~GTform()
@@ -12,36 +15,25 @@ rt::GTform::~GTform()
 
 }
 
-rt::GTform::GTform(const qbMatrix2<double> &fwd, const qbMatrix2<double> &bck)
+rt::GTform::GTform(const glm::dmat4 &fwd, const glm::dmat4 &bck)
 {
-	// Verify that the inputs are 4x4
-	if ((fwd.GetNumRows() != 4) || (fwd.GetNumCols() != 4) ||
-		(bck.GetNumRows() != 4) || (bck.GetNumCols() != 4))
-	{
-		throw std::invalid_argument("Cannot construct GTform, inputs are not all 4x4.");
-	}
-
+	/* No need to verify dimensions because parameter type 
+		guarantees that both matrices are 4x4 */
 	m_Fwdtfm = fwd;
 	m_Bcktfm = bck;
 }
 
-void rt::GTform::SetTransform(	const qbVector3<double> &translation, 
-								const qbVector3<double> &rotation, 
-								const qbVector3<double> &scale)
+void rt::GTform::SetTransform(	const glm::dvec3 &translation, 
+								const glm::dvec3 &rotation, 
+								const glm::dvec3 &scale)
 {
 	// Define a matrix for each component of the transform
-	qbMatrix2<double> translationMatrix	{ 4,4 };
-	qbMatrix2<double> rotationMatrixX	{ 4,4 };
-	qbMatrix2<double> rotationMatrixY	{ 4,4 };
-	qbMatrix2<double> rotationMatrixZ	{ 4,4 };
-	qbMatrix2<double> scaleMatrix		{ 4,4 };
-
-	// Set the matrices to identity
-	translationMatrix.SetToIdentity();
-	rotationMatrixX.SetToIdentity();
-	rotationMatrixY.SetToIdentity();
-	rotationMatrixZ.SetToIdentity();
-	scaleMatrix.SetToIdentity();
+	//  and initialize to identity matrix
+	glm::dmat4 translationMatrix	{ 1.0 };
+	glm::dmat4 rotationMatrixX		{ 1.0 };
+	glm::dmat4 rotationMatrixY		{ 1.0 };
+	glm::dmat4 rotationMatrixZ		{ 1.0 };
+	glm::dmat4 scaleMatrix			{ 1.0 };
 
 	// Populate the matrices with the appropriate values
 	// First, the translation matrix
@@ -49,10 +41,9 @@ void rt::GTform::SetTransform(	const qbVector3<double> &translation,
 	*	| 0 1 0 ty |
 	*	| 0 0 1 tz |
 	*	| 0 0 0 1  | */
-	translationMatrix.SetElement(0, 3, translation.GetElement(0));
-	translationMatrix.SetElement(1, 3, translation.GetElement(1));
-	translationMatrix.SetElement(2, 3, translation.GetElement(2));
 
+	translationMatrix = glm::translate(translationMatrix, translation);
+	
 	// Then, rotation matrices
 	/*  Rz
 	*	| cos(θz) -sin(θz) 0 0 |
@@ -60,10 +51,7 @@ void rt::GTform::SetTransform(	const qbVector3<double> &translation,
 	*	|   0        0     1 0 |
 	*	|   0        0     0 1 |
 	*/
-	rotationMatrixZ.SetElement(0, 0,  cos(rotation.GetElement(0)));
-	rotationMatrixZ.SetElement(1, 0,  sin(rotation.GetElement(0)));
-	rotationMatrixZ.SetElement(0, 1, -sin(rotation.GetElement(0)));
-	rotationMatrixZ.SetElement(1, 1,  cos(rotation.GetElement(0)));
+	rotationMatrixZ = glm::rotate(rotationMatrixZ, glm::radians(rotation.x), glm::dvec3{ 0.0, 0.0, 1.0 });
 	
 	/*  Ry
 	*	|  cos(θy) 0 sin(θy) 0 |
@@ -71,10 +59,7 @@ void rt::GTform::SetTransform(	const qbVector3<double> &translation,
 	*	| -sin(θy)   cos(θy) 0 |
 	*	|    0     0    0	 1 |
 	*/
-	rotationMatrixY.SetElement(0, 0,  cos(rotation.GetElement(1)));
-	rotationMatrixY.SetElement(2, 0, -sin(rotation.GetElement(1)));
-	rotationMatrixY.SetElement(0, 2,  sin(rotation.GetElement(1)));
-	rotationMatrixY.SetElement(2, 2,  cos(rotation.GetElement(1)));
+	rotationMatrixY = glm::rotate(rotationMatrixY, glm::radians(rotation.y), glm::dvec3{ 0.0, 1.0, 0.0 });
 
 	/*  Rx
 	*	| 1    0		0	 0 |
@@ -82,15 +67,10 @@ void rt::GTform::SetTransform(	const qbVector3<double> &translation,
 	*	| 0 sin(θx)  cos(θx) 0 |
 	*	| 0    0		0	 1 |
 	*/
-	rotationMatrixX.SetElement(1, 1,  cos(rotation.GetElement(2)));
-	rotationMatrixX.SetElement(1, 2,  sin(rotation.GetElement(2)));
-	rotationMatrixX.SetElement(2, 1, -sin(rotation.GetElement(2)));
-	rotationMatrixX.SetElement(2, 2,  cos(rotation.GetElement(2)));
+	rotationMatrixX = glm::rotate(rotationMatrixX, glm::radians(rotation.z), glm::dvec3{1.0, 0.0, 0.0});
 
 	// Finally, the scale matrix
-	scaleMatrix.SetElement(0, 0, scale.GetElement(0));
-	scaleMatrix.SetElement(1, 1, scale.GetElement(1));
-	scaleMatrix.SetElement(2, 2, scale.GetElement(2));
+	scaleMatrix = glm::scale(scaleMatrix, glm::dvec3{ scale.x, scale.y, scale.z });
 
 	// Combine to give the final forward transformation matrix
 	// Notice that the order in which the transformations are applied based on this multiplication is:
@@ -102,8 +82,7 @@ void rt::GTform::SetTransform(	const qbVector3<double> &translation,
 			   rotationMatrixZ;
 
 	// Compute the backwards transform
-	m_Bcktfm = m_Fwdtfm;
-	m_Bcktfm.Inverse();
+	m_Bcktfm = glm::inverse(m_Fwdtfm);
 }
 
 rt::Ray rt::GTform::Apply(const rt::Ray &inputRay, bool dirFlag)
@@ -129,18 +108,13 @@ rt::Ray rt::GTform::Apply(const rt::Ray &inputRay, bool dirFlag)
 	return outputRay;
 }
 
-qbVector3<double> rt::GTform::Apply(const qbVector3<double> &inputVector, bool dirFlag)
+glm::dvec3 rt::GTform::Apply(const glm::dvec3 &inputVector, bool dirFlag)
 {
 	// Convert inputVector to a 4-element vector
-	std::vector<double> tempData{	inputVector.GetElement(0),
-									inputVector.GetElement(1),
-									inputVector.GetElement(2),
-									1.0 };
-
-	qbVector4<double> tempVector{ tempData };
+	glm::dvec4 tempVector{ inputVector, 1.0 };
 
 	// Create a vector for the result
-	qbVector4<double> resultVector;
+	glm::dvec4 resultVector{ 0.0 };
 
 	if (dirFlag)
 	{
@@ -154,9 +128,7 @@ qbVector3<double> rt::GTform::Apply(const qbVector3<double> &inputVector, bool d
 	}
 
 	// Reform the output as a 3-element vector
-	qbVector3<double> outputVector { std::vector<double> {	resultVector.GetElement(0),
-															resultVector.GetElement(1),
-															resultVector.GetElement(2) }};
+	glm::dvec3 outputVector{ resultVector };
 
 	return outputVector;
 }
@@ -173,24 +145,21 @@ void rt::GTform::PrintMatrix(bool dirFlag)
 	}
 }
 
-void rt::GTform::PrintVector(const qbVector3<double> &vector)
-{
-	int nRows = vector.GetNumDims();
-	for (int row = 0; row < nRows; row++)
+void rt::GTform::PrintVector(const glm::dvec3 &vector)
+{;
+	for (int row = 0; row < 3; row++)
 	{
-		std::cout << std::fixed << std::setprecision(3) << vector.GetElement(row) << std::endl;
+		std::cout << std::fixed << std::setprecision(3) << vector[row] << std::endl;
 	}
 }
 
-void rt::GTform::Print(const qbMatrix2<double> &matrix)
+void rt::GTform::Print(const glm::dmat4 &matrix)
 {
-	int nRows = matrix.GetNumRows();
-	int nCols = matrix.GetNumCols();
-	for (int row = 0; row < nRows; row++)
+	for (int row = 0; row < 4; row++)
 	{
-		for (int col = 0; col < nCols; col++)
+		for (int col = 0; col < 4; col++)
 		{
-			std::cout << std::fixed << std::setprecision(3) << matrix.GetElement(row, col) << " ";
+			std::cout << std::fixed << std::setprecision(3) << matrix[row][col] << " ";
 		}
 		std::cout << std::endl;
 	}
@@ -201,15 +170,14 @@ namespace rt
 	rt::GTform operator*(const rt::GTform &lhs, const rt::GTform &rhs)
 	{
 		// Form the product of the two forward transforms
-		qbMatrix2<double> fwdResult = lhs.m_Fwdtfm * rhs.m_Fwdtfm;
+		glm::dmat4 fwdResult = lhs.m_Fwdtfm * rhs.m_Fwdtfm;
 		
 		// Compute the backward transform as the inverse of the forward transform
 		/* The "Inverse" function is a numerical function that computes inverse matrix to a significant amount of decimal places, but
 			it is not perfectly accurate. By multiplying lhs's and rhs's backward transforms (which are each computed using inverse on their respective forwards)
 			we run the risk of compounding the error by multiplying two results of the "Inverse" function. Instead, we call inverse on the product of the forward transforms 
 		*/
-		qbMatrix2<double> bckResult = fwdResult;
-		bckResult.Inverse();
+		glm::dmat4 bckResult = glm::inverse(fwdResult);
 
 		// Form the final result
 		rt::GTform finalResult{ fwdResult, bckResult };

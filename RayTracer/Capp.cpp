@@ -1,5 +1,8 @@
 #include "Capp.hpp"
 
+// lib
+#include <iostream>
+#include <iomanip>
 
 Capp::Capp()
 {
@@ -234,12 +237,11 @@ void Capp::OnExit()
 }
 
 // PRIVATE FUNCTIONS		
-void Capp::PrintVector(const qbVector3<double> &inputVector) const
+void Capp::PrintVector(const glm::dvec3 &inputVector) const
 {
-	int rows = inputVector.GetNumDims();
-	for (int r = 0; r < rows; r++) 
+	for (int r = 0; r < 3; r++) 
 	{
-		std::cout << std::fixed << std::setprecision(3) << inputVector.GetElement(r) << std::endl;
+		std::cout << std::fixed << std::setprecision(3) << inputVector[r] << std::endl;
 	}
 }
 
@@ -324,7 +326,7 @@ void Capp::ConvertImageToTexture(rt::DATA::tile &tile)
 	for (int i = 0; i < tile.width * tile.height; i++)
 	{
 		if(tempPixels)
-			tempPixels[i] = ConvertColor(tile.rgbData.at(i).m_x, tile.rgbData.at(i).m_y, tile.rgbData.at(i).m_z);
+			tempPixels[i] = ConvertColor(tile.rgbData[i].x, tile.rgbData[i].y, tile.rgbData[i].z);
 	}
 
 	// Update the texture with the pixel buffer

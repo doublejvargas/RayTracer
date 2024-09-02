@@ -29,19 +29,19 @@ namespace rt
 		void RenderTile(rt::DATA::tile *tile);
 
 		// Function to cast a ray into the scene
-		bool CastRay(rt::Ray &castRay,
-			std::shared_ptr<rt::ObjectBase> &closestObject,
-			qbVector3<double> &closestIntPoint,
-			qbVector3<double> &closestLocalNormal,
-			qbVector3<double> &closestLocalColor
-		);
+		bool CastRay(	rt::Ray &castRay,
+						std::shared_ptr<rt::ObjectBase> &closestObject,
+						glm::dvec3 &closestIntPoint,
+						glm::dvec3 &closestLocalNormal,
+						glm::dvec3 &closestLocalColor
+					);
 
 		virtual void SetupSceneObjects();
 
 	// Private methods
 	private:
 		// Render a pixel
-		qbVector3<double> RenderPixel(int x, int y, int width, int height);
+		glm::dvec3 RenderPixel(int x, int y, int width, int height);
 
 		// Function to convert coordinates to a linear index
 		int Sub2Ind(int x, int y, int width, int height);

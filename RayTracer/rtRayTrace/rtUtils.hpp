@@ -1,9 +1,11 @@
 #pragma once
 
-#include "toolbox/qbVector3.hpp" // includes std::vector
+//#include "toolbox/qbVector3.hpp" // includes std::vector
+#include "toolbox/glm/glm.hpp"
 
 // lib
 #include <SDL2/SDL.h>
+#include <vector>
 
 namespace rt
 {
@@ -19,7 +21,7 @@ namespace rt
 			int renderComplete = 0;
 			bool textureComplete = false; // might be obsolete
 			SDL_Texture *pTexture;
-			std::vector<qbVector3<double>> rgbData;
+			std::vector<glm::dvec3> rgbData;
 		};
 	}
 }

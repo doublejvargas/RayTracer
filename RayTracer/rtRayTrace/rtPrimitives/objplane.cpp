@@ -11,22 +11,21 @@ rt::ObjPlane::~ObjPlane()
 }
 
 bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
-										qbVector3<double> &intPoint,
-										qbVector3<double> &localNormal,
-										qbVector3<double> &localColor)
+										glm::dvec3 &intPoint,
+										glm::dvec3 &localNormal,
+										glm::dvec3 &localColor)
 {
 	// Copy the ray and apply the backwards transform
 	// this is the ^l in ^l = ^a + ^kt
 	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Copy the m_lab vector from bckRay and normalize it
-	qbVector3<double> k = bckRay.lab;
-	k.Normalize(); // unit vector ^k from the line equation above
+	glm::dvec3 k = glm::normalize(bckRay.lab); // unit vector ^k from the line equation above
 
 	/* Check if there is an intersection, ie. if the castRay is not parallel to the plane
 		NOTE: kz being = 0 means parallel because the plane is the XY plane (where Z is 0 always),
 		so, any vector that is parallel to this plane, will have a Z-component of 0, ie, element at index 2 of a qbVector3 will be zero */
-	if (!CloseEnough(k.GetElement(2), 0.0))
+	if (!CloseEnough(k[2], 0.0))
 	{
 		// If above condition true: there is an intersection because vector is not parallel to plane
 
@@ -64,7 +63,7 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 		*	This is the value that we compute below:
 		*	bckRay.p1 is equivalent to ^a in the line equation
 		*/
-		double t = bckRay.p1.GetElement(2) / -k.GetElement(2);
+		double t = bckRay.p1[2] / -k[2];
 
 		// If t is negative, then the intersection point must be behind the camera
 		//  and we can ignore it
@@ -72,9 +71,9 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 		{
 			// Compute the values for u and v
 			// u = ax + kx * t
-			double u = bckRay.p1.GetElement(0) + (k.GetElement(0) * t);
+			double u = bckRay.p1[0] + (k[0] * t);
 			// v = ay + ky * t
-			double v = bckRay.p1.GetElement(1) + (k.GetElement(1) * t);
+			double v = bckRay.p1[1] + (k[1] * t);
 
 			/* If magnitude of both u and v is less than or equal to one, 
 			   then we must be in the plane */
@@ -82,21 +81,20 @@ bool rt::ObjPlane::TestIntersection(	const Ray &castRay,
 			{
 				// Compute the point of intersection
 				// poi = ^a + ^kt (remember, general equation for a line, and we have computed t!)
-				qbVector3<double> poi = bckRay.p1 + (t * k);
+				glm::dvec3 poi = bckRay.p1 + (t * k);
 
 				// Transform the intersection point back into world coordinates
 				intPoint = transformMatrix_.Apply(poi, rt::FWDTFORM);
 
 				// Compute the local normal (shouldn't this be global (world space) normal?)
 				// origin in local object space
-				qbVector3<double> localOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
+				glm::dvec3 localOrigin{ 0.0, 0.0, 0.0 };
 				// normal to XY plane in local object space, vector with Z component (why negative?, perhaps because it is pointing toward camera pinhole!)
-				qbVector3<double> normalVector{ std::vector<double>{0.0, 0.0, -1.0} };
+				glm::dvec3 normalVector{ 0.0, 0.0, -1.0 };
 				// Origin transformed to world space
-				qbVector3<double> globalOrigin = transformMatrix_.Apply(localOrigin, rt::FWDTFORM);
-				// Transform local normal (global?) to world space and get origin pointing toward normal
-				localNormal = transformMatrix_.Apply(normalVector, rt::FWDTFORM) - globalOrigin;
-				localNormal.Normalize(); // unit vector
+				glm::dvec3 globalOrigin = transformMatrix_.Apply(localOrigin, rt::FWDTFORM);
+				// Transform local normal (global?) to world space and get origin pointing toward normal (normalized)
+				localNormal = glm::normalize(transformMatrix_.Apply(normalVector, rt::FWDTFORM) - globalOrigin);
 
 				// Return base color
 				localColor = baseColor_;

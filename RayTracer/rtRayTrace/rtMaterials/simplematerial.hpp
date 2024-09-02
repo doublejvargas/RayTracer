@@ -13,23 +13,22 @@ namespace rt
 		virtual ~SimpleMaterial() override;
 
 		// Return the color of the material
-		virtual qbVector3<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
-												const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-												const std::shared_ptr<rt::ObjectBase> &currentObject,
-												const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
-												const rt::Ray &cameraRay
-											  ) override;
+		virtual glm::dvec3 ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+											const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+											const std::shared_ptr<rt::ObjectBase> &currentObject,
+											const glm::dvec3 &intPoint, const glm::dvec3 &localNormal,
+											const rt::Ray &cameraRay
+									   ) override;
 
 		// Compute specular highlights
-		qbVector3<double> ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
-											const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-											const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
-											const rt::Ray &cameraRay
-										);
+		glm::dvec3 ComputeSpecular(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+									const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+									const glm::dvec3 &intPoint, const glm::dvec3 &localNormal,
+									const rt::Ray &cameraRay
+								 );
 	public:
-		qbVector3<double> baseColor_{ std::vector<double>{1.0, 0.0, 1.0} };
+		glm::dvec3 baseColor_{ 1.0, 0.0, 1.0 };
 		double reflectivity_ = 0.0;
 		double shininess_ = 0.0;
-
 	};
 }

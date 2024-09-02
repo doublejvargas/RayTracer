@@ -14,7 +14,7 @@ rt::ObjectBase::~ObjectBase()
 
 }
 
-bool rt::ObjectBase::TestIntersection(const Ray &castRay, qbVector3<double> &intPoint, qbVector3<double> &localNormal, qbVector3<double> &localColor)
+bool rt::ObjectBase::TestIntersection(const Ray &castRay, glm::dvec3 &intPoint, glm::dvec3 &localNormal, glm::dvec3 &localColor)
 {
 	return false; //placeholder
 }

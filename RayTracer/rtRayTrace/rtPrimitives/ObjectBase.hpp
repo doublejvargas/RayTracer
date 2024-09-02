@@ -4,7 +4,8 @@
 #include "gtfm.hpp" 
 
 // tools
-#include "toolbox/qbVector.h"
+//#include "toolbox/qbVector.h"
+#include "toolbox/glm/glm.hpp"
 
 //lib
 #include <memory>
@@ -24,9 +25,9 @@ namespace rt
 
 		// Function to test for intersections
 		virtual bool TestIntersection(	const Ray &castRay,
-										qbVector3<double> &intPoint, 
-										qbVector3<double> &localNormal, 
-										qbVector3<double> &localColor);
+										glm::dvec3 &intPoint, 
+										glm::dvec3 &localNormal, 
+										glm::dvec3 &localColor);
 
 		// Set the transform matrix
 		void SetTransformMatrix(const rt::GTform &transformMatrix);
@@ -40,10 +41,10 @@ namespace rt
 	// Public member variables
 	public:
 		// Base color of the object
-		qbVector3<double> baseColor_;
+		glm::dvec3 baseColor_	{ 0.0 };
 
 		// Geometric transform applied to the object
-		rt::GTform transformMatrix_;
+		rt::GTform transformMatrix_ {};
 
 		// A reference to the material assigned to this object
 		std::shared_ptr<rt::MaterialBase> pMaterial_;

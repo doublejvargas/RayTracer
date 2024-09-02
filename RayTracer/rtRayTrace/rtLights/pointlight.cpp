@@ -2,7 +2,7 @@
 
 rt::PointLight::PointLight()
 {
-	m_Color = qbVector3<double>{ std::vector<double>{1.0, 1.0, 1.0} };
+	m_Color = glm::dvec3{ 1.0, 1.0, 1.0 };
 	m_Intensity = 1.0;
 }
 
@@ -11,13 +11,17 @@ rt::PointLight::~PointLight()
 
 }
 
-bool rt::PointLight::ComputeIllumination(const qbVector3<double> &intPoint, const qbVector3<double> &localNormal, const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList, const std::shared_ptr<rt::ObjectBase> &currentObject, qbVector3<double> &color, double &intensity)
+bool rt::PointLight::ComputeIllumination(	const glm::dvec3 &intPoint, 
+											const glm::dvec3 &localNormal, 
+											const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList, 
+											const std::shared_ptr<rt::ObjectBase> &currentObject, glm::dvec3 &color, double &intensity
+										)
 {
 	// Construct a unit vector pointing from the intersection point to the light
-	qbVector3<double> toLightDir = (m_Location - intPoint).Normalized();
+	glm::dvec3 toLightDir = glm::normalize(m_Location - intPoint);
 
 	// Compute a starting point
-	qbVector3<double> startPoint{ intPoint };
+	glm::dvec3 startPoint{ intPoint };
 
 	// Construct a ray from point of intersection to the light
 	// Here startPoint is a point, and the second argument is the sum of startPoint (a point) and toLightDir (a unit vector), which 
@@ -26,9 +30,9 @@ bool rt::PointLight::ComputeIllumination(const qbVector3<double> &intPoint, cons
 
 	/* Check for intersection with all of the objects
 	   in the scene, except for the current one */
-	qbVector3<double> poi;
-	qbVector3<double> poiNormal;
-	qbVector3<double> poiColor;
+	glm::dvec3 poi			{ 0.0 };
+	glm::dvec3 poiNormal	{ 0.0 };
+	glm::dvec3 poiColor		{ 0.0 };
 	bool validInt = false;
 	for (auto sceneObject : objectList)
 	{
@@ -55,7 +59,7 @@ bool rt::PointLight::ComputeIllumination(const qbVector3<double> &intPoint, cons
 	// This simplifies computation as per the formula for dot product: 
 	//		^a·^b = |a||b| cos(theta) --> cos(theta) = (^a·^b)/ |a||b|, where ^a and ^b would be lightDir and localNormal,
 	//       meaning that the denominator factors out to 1.
-		double angle = acos(qbVector3<double>::dot(localNormal, toLightDir));
+		double angle = acos(glm::dot(localNormal, toLightDir));
 		if (angle > 3.1415926 / 2.0) // pi/2 = 180, if angle > 180, surface is facing away from light source.
 		{
 			// No illumination

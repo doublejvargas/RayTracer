@@ -2,8 +2,11 @@
 
 #include "rtPrimitives/ObjectBase.hpp"
 #include "rtLights/LightBase.hpp"
-#include "toolbox/qbVector3.hpp"
+//#include "toolbox/qbVector3.hpp"
 #include "Ray.hpp"
+
+// tool
+#include "toolbox/glm/glm.hpp"
 
 // lib
 #include <memory>
@@ -17,37 +20,37 @@ namespace rt
 		virtual ~MaterialBase();
 
 		// Return the color of the material
-		virtual qbVector3<double> ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
-												const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-												const std::shared_ptr<rt::ObjectBase> &currentObject,
-												const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
-												const rt::Ray &cameraRay
-											 );
+		virtual glm::dvec3 ComputeColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+											const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+											const std::shared_ptr<rt::ObjectBase> &currentObject,
+											const glm::dvec3 &intPoint, const glm::dvec3 &localNormal,
+											const rt::Ray &cameraRay
+									   );
 
 		// Compute diffuse color
-		static qbVector3<double> ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
-														const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-														const std::shared_ptr<rt::ObjectBase> &currentObject,
-														const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
-														const qbVector3<double> &baseColor
-												   );
+		static glm::dvec3 ComputeDiffuseColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+												const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+												const std::shared_ptr<rt::ObjectBase> &currentObject,
+												const glm::dvec3 &intPoint, const glm::dvec3 &localNormal,
+												const glm::dvec3 &baseColor
+											);
 
 		// Compute the reflection color
-		qbVector3<double> ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
-													const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
-													const std::shared_ptr<rt::ObjectBase> &currentObject,
-													const qbVector3<double> &intPoint, const qbVector3<double> &localNormal,
-													const rt::Ray &incidentRay
-											   );
+		glm::dvec3 ComputeReflectionColor(	const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
+											const std::vector<std::shared_ptr<rt::LightBase>> &lightList,
+											const std::shared_ptr<rt::ObjectBase> &currentObject,
+											const glm::dvec3 &intPoint, const glm::dvec3 &localNormal,
+											const rt::Ray &incidentRay
+										);
 
 		// Cast a ray into the scene
 		bool CastRay(	const rt::Ray &castRay, 
 						const std::vector<std::shared_ptr<rt::ObjectBase>> &objectList,
 						const std::shared_ptr<rt::ObjectBase> &thisObject,
 						std::shared_ptr<rt::ObjectBase> &closestObject,
-						qbVector3<double> &closestIntPoint,
-						qbVector3<double> &closestLocalNormal,
-						qbVector3<double> &closestLocalColor
+						glm::dvec3 &closestIntPoint,
+						glm::dvec3 &closestLocalNormal,
+						glm::dvec3 &closestLocalColor
 					);
 
 	public:

@@ -44,30 +44,29 @@ rt::ObjSphere::~ObjSphere()
 * 
 *	Note: since a = (v̂·v̂), which is the dot product of two unit vectors, it is always equal to 1.0.
 */
-bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector3<double> &intPoint, qbVector3<double> &localNormal, qbVector3<double> &localColor)
+bool rt::ObjSphere::TestIntersection(const Ray &castRay, glm::dvec3 &intPoint, glm::dvec3 &localNormal, glm::dvec3 &localColor)
 {
 	// Transform castRay into coordinate system of the sphere.
 	// For this, we use backwards transform to transform from current ray's world coordinates to local coordinates.
 	rt::Ray bckRay = transformMatrix_.Apply(castRay, rt::BCKTFORM);
 
 	// Compute the values of a, b and c
-	qbVector3<double> vHat = bckRay.lab;
-	vHat.Normalize();
+	glm::dvec3 vHat = glm::normalize(bckRay.lab);
 
 	/* Note that 'a' is equal to the squared magnitude of the direction of the cast ray. As this will be a unit vector,
 	   we can conclude that the value of 'a' will always be 1.
 	*/
 	// double a = 1.0;
 
-	double b = 2.0 * qbVector3<double>::dot(bckRay.p1, vHat);
+	double b = 2.0 * glm::dot(bckRay.p1, vHat);
 
-	double c = qbVector3<double>::dot(bckRay.p1, bckRay.p1) - 1.0;
+	double c = glm::dot(bckRay.p1, bckRay.p1) - 1.0;
 
 	// Test whether we actually have an intersection
 	double discriminant_squared = (b * b) - 4.0 * c;
 
 	// point of intersection in the LOCAL coordinate system of the sphere
-	qbVector3<double> poi; 
+	glm::dvec3 poi { 0.0 };
 	if (discriminant_squared > 0.0)
 	{
 		double discriminant = sqrt(discriminant_squared);
@@ -99,10 +98,9 @@ bool rt::ObjSphere::TestIntersection(const Ray &castRay, qbVector3<double> &intP
 			// Compute the local normal
 			// Because we have a sphere located at the origin, the normal vector is
 			//  simply a vector from the origin to the point of intersection, i.e., the intersection point.
-			qbVector3<double> objOrigin{ std::vector<double>{0.0, 0.0, 0.0} };
-			qbVector3<double> newObjOrigin = transformMatrix_.Apply(objOrigin, rt::FWDTFORM);
-			localNormal = intPoint - newObjOrigin;
-			localNormal.Normalize();
+			glm::dvec3 objOrigin { 0.0 };
+			glm::dvec3 newObjOrigin = transformMatrix_.Apply(objOrigin, rt::FWDTFORM);
+			localNormal = glm::normalize(intPoint - newObjOrigin);
 
 			// Return the base color
 			localColor = baseColor_;

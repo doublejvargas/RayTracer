@@ -3,6 +3,8 @@
 
 // lib
 #include <chrono>
+#include <iostream>
+#include <iomanip>
 
 rt::Scene::Scene()
 {
@@ -33,8 +35,8 @@ bool rt::Scene::Render(rtImage &outputImage)
 
 		for (int x = 0; x < width; x++)
 		{
-			qbVector3<double> pixelColor = RenderPixel(x, y, width, height);
-			outputImage.SetPixel(x, y, pixelColor.GetElement(0), pixelColor.GetElement(1), pixelColor.GetElement(2));
+			glm::dvec3 pixelColor = RenderPixel(x, y, width, height);
+			outputImage.SetPixel(x, y, pixelColor[0], pixelColor[1], pixelColor[2]);
 		}
 	}
 	// Record the end time
@@ -51,7 +53,7 @@ bool rt::Scene::Render(rtImage &outputImage)
 void rt::Scene::RenderTile(rt::DATA::tile *tile)
 {
 	// Loop over each pixel in the tile
-	qbVector3<double> pixelColor;
+	glm::dvec3 pixelColor	{ 0.0 };
 	for (int y = 0; y < tile->height; y++)
 	{
 		for (int x = 0; x < tile->width; x++)
@@ -66,14 +68,14 @@ void rt::Scene::RenderTile(rt::DATA::tile *tile)
 
 bool rt::Scene::CastRay(	rt::Ray &castRay, 
 							std::shared_ptr<rt::ObjectBase> &closestObject,
-							qbVector3<double> &closestIntPoint,
-							qbVector3<double> &closestLocalNormal, 
-							qbVector3<double> &closestLocalColor
+							glm::dvec3 &closestIntPoint,
+							glm::dvec3 &closestLocalNormal, 
+							glm::dvec3 &closestLocalColor
 						)
 {
-	qbVector3<double> intPoint;
-	qbVector3<double> localNormal;
-	qbVector3<double> localColor;
+	glm::dvec3 intPoint		{ 0.0 };
+	glm::dvec3 localNormal	{ 0.0 };
+	glm::dvec3 localColor	{ 0.0 };
 	double minDist = 1e6;
 	bool intersectionFound = false;
 	for (auto currentObject : objectList_)
@@ -87,7 +89,7 @@ bool rt::Scene::CastRay(	rt::Ray &castRay,
 			intersectionFound = true;
 
 			// Compute distance between the camera and the point of intersection
-			double dist = (intPoint - castRay.p1).norm();
+			double dist = glm::length(intPoint - castRay.p1);
 
 			/* If this object is closer to the camera than any one that we have
 			   seen before, then store a reference to it */
@@ -111,7 +113,7 @@ void rt::Scene::SetupSceneObjects()
 
 }
 
-qbVector3<double> rt::Scene::RenderPixel(int x, int y, int width, int height)
+glm::dvec3 rt::Scene::RenderPixel(int x, int y, int width, int height)
 {
 	std::shared_ptr<rt::ObjectBase> closestObject;
 	rt::Ray	cameraRay;
@@ -119,7 +121,7 @@ qbVector3<double> rt::Scene::RenderPixel(int x, int y, int width, int height)
 	double yFactor = 1.0 / (static_cast<double>(height) / 2.0);
 	double minDist = 1e6;
 	double maxDist = 0.0;
-	qbVector3<double> outputColor;
+	glm::dvec3 outputColor{ 0.0 };
 
 	// Normalize x and y coordinates
 	double normX = (static_cast<double>(x) * xFactor) - 1.0; // x * xFactor is in range [0, 2], so subtracting one yields range [-1, 1]
@@ -129,9 +131,9 @@ qbVector3<double> rt::Scene::RenderPixel(int x, int y, int width, int height)
 	camera_.GenerateRay(static_cast<float>(normX), static_cast<float>(normY), cameraRay); //note this returns a boolean! we might want to use that
 
 	// Test for intersections with all objects in the scene
-	qbVector3<double> closestIntPoint;
-	qbVector3<double> closestLocalNormal;
-	qbVector3<double> closestLocalColor;
+	glm::dvec3 closestIntPoint		{ 0.0 };
+	glm::dvec3 closestLocalNormal	{ 0.0 };
+	glm::dvec3 closestLocalColor	{ 0.0 };
 	bool intersectionFound = CastRay(cameraRay, closestObject, closestIntPoint, closestLocalNormal, closestLocalColor);
 
 	/* Compute the illumination for the closest object, assuming that there
@@ -143,14 +145,14 @@ qbVector3<double> rt::Scene::RenderPixel(int x, int y, int width, int height)
 		{
 			// Use material to compute color
 			rt::MaterialBase::reflectionRayCount_ = 0;
-			qbVector3<double> color = closestObject->pMaterial_->ComputeColor(objectList_, lightList_, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
+			glm::dvec3 color = closestObject->pMaterial_->ComputeColor(objectList_, lightList_, closestObject, closestIntPoint, closestLocalNormal, cameraRay);
 
 			outputColor = color;
 		}
 		else
 		{
 			// Use basic method to compute color
-			qbVector3<double> matColor = rt::MaterialBase::ComputeDiffuseColor(	objectList_, lightList_,
+			glm::dvec3 matColor = rt::MaterialBase::ComputeDiffuseColor(	objectList_, lightList_,
 																				closestObject, closestIntPoint,
 																				closestLocalNormal, closestObject->baseColor_
 																			  );
