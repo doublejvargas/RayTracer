@@ -28,7 +28,7 @@ public:
 	void OnExit();
 
 	// Function to handle rendering a tile
-	void RenderTile(rt::DATA::tile *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag);
+	void RenderTile(rt::DATA::tile *tile, std::atomic<uint32_t> *threadCounter, std::atomic<int> *tileFlag);
 
 private:
 	// For debugging
@@ -69,11 +69,11 @@ private:
 	int m_numTilesX, m_numTilesY;
 
 	// Thread stuff
-	int m_maxThreads = 6;
+	uint32_t m_maxThreads = 1;
 	int m_numCurrentThreads = 0;
 	std::vector<int> m_tilesCurrentlyRendering;
 	std::vector<std::thread> m_Threads;
-	std::atomic<int> *m_threadCounter;
+	std::atomic<uint32_t> *m_threadCounter;
 
 	// Scene instance
 	rt::ReflectionScene m_Scene;

@@ -9,7 +9,7 @@ Capp::Capp()
 	m_isRunning = true;
 	m_pWindow = nullptr;
 	m_pRenderer = nullptr;
-	m_threadCounter = new std::atomic<int>(0); // Must delete this!
+	m_threadCounter = new std::atomic<uint32_t>(0); // Must delete this!
 }
 
 bool Capp::OnInit()
@@ -40,9 +40,10 @@ bool Capp::OnInit()
 
 		std::cout << "Generated grid of tiles successfully, size: " << m_Tiles.size() << std::endl;
 
-		// Initialize the thread counter
-		// Since my cpu has 6 cores (12 available cpus), I will set the max number of threads to be 12
-		m_maxThreads = 12;
+		// Initialize max threads, determining at runtime the maximum number of threads that the machine's processor supports.
+		m_maxThreads = std::jthread::hardware_concurrency();
+		std::cout << "Processor supports a max of: " << m_maxThreads << " concurrent threads\n";
+
 		// Stores the value "0" into m_threadCounter in a * THREAD-SAFE * way, guaranteeing that it will not
 		//  interfere or cause issues if the variable is accessed concurrently.
 		// To write using the std::atomic library, we use the store method with the std::memory_order_release flag.
@@ -131,7 +132,7 @@ void Capp::OnLoop()
 	//	}
 	//}
 
-	for (int i = 0; i < m_Tiles.size(); i++)
+	for (uint32_t i = 0; i < m_Tiles.size(); i++)
 	{
 		// If tile i is waiting to be rendered
 		if (m_tileFlags.at(i)->load(std::memory_order_acquire) == 0) //To access using the std::atomic library, we use the load method with the std::memory_order_acquire flag
@@ -147,12 +148,14 @@ void Capp::OnLoop()
 				//  all the arguments that the executable requires, in this case it would be a pointer to a tile,
 				//  an std::atomic<int> pointer to the thread counter and an std::atomic<int> pointer to the tile flag.
 				//  Why do we pass a pointer to this instance to the thread constructor?
-				std::thread renderThread(&Capp::RenderTile, this, &m_Tiles.at(i), m_threadCounter, m_tileFlags.at(i));
+				std::jthread renderThread(&Capp::RenderTile, this, &m_Tiles.at(i), m_threadCounter, m_tileFlags.at(i));
 				/* Using renderThread.join() here would spawn the 12 threads and then wait for all of them to finish before spawning the next 12
 				    this would be an inefficient use of threads for this application. Instead, we want to spawn threads which will execute immediately,
 					finish, and immediately spawn a new thread as soon as available to render a tile that is waiting to be rendered. For that use case,
 					we use renderThread.detach() */
 				renderThread.detach();
+				std::cout << "Num of running threads: " << m_threadCounter->load(std::memory_order_acquire) << "\r";
+				std::cout.flush();
 			}
 		}
 	}
@@ -360,7 +363,7 @@ uint32_t Capp::ConvertColor(const double red, const double green, const double b
 	return pixelColor;
 }
 
-void Capp::RenderTile(rt::DATA::tile *tile, std::atomic<int> *threadCounter, std::atomic<int> *tileFlag)
+void Capp::RenderTile(rt::DATA::tile *tile, std::atomic<uint32_t> *threadCounter, std::atomic<int> *tileFlag)
 {
 	/* This piece of code demonstrates the importance of using std::atomic for tileFlag, as we see that
 	   this variable is modified multiple times in this method, and we know that the variable is also being 
